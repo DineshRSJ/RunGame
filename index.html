@@ -133,6 +133,25 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .pt .panel{left:4em;right:4em;top:46em;width:auto;padding:2em}
 .pt .pname{font-size:4em}
 .pt .row{bottom:3.4em}
+
+#who{position:absolute;top:calc(var(--u,1px)*14);left:50%;transform:translateX(-50%);z-index:8;display:none;font:600 1.7em Fredoka,sans-serif;color:#eafff3;background:#04140ccc;border:.1em solid #45e39a99;border-radius:2em;padding:.2em .9em .26em;cursor:pointer;white-space:nowrap;text-shadow:0 .06em .1em #000a}
+#who small{font:500 .7em Fredoka,sans-serif;color:#7ff3b4;margin-left:.5em}
+#auth{background:radial-gradient(ellipse at 50% 50%,#0d3a2cf2,#04140cfa 75%);backdrop-filter:blur(.3em);-webkit-backdrop-filter:blur(.3em);z-index:6}
+.acard{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44em;display:flex;flex-direction:column;gap:.7em;align-items:stretch}
+.atabs{display:flex;gap:.6em}
+.atabs button{flex:1;font:700 2em Fredoka,sans-serif;padding:.3em 0 .36em;border-radius:1.2em;border:.07em solid #ffffff55;background:#ffffff14;color:#cfe;cursor:pointer}
+.atabs button.on{background:linear-gradient(#45e39a,#12a468);color:#fff;border-color:#b9ffd8aa;box-shadow:0 .16em 0 #0a6a44,0 0 1em #45e39a88}
+.atabs button.lk{opacity:.55}
+.acard input{font:500 2em Fredoka,sans-serif;padding:.35em .7em;border-radius:.8em;border:.08em solid #ffffff66;background:#0b2a1fe6;color:#fff;outline:0;width:100%;box-sizing:border-box}
+.acard input:focus{border-color:#45e39a}
+#aMsg{min-height:1.4em;font:500 1.7em Fredoka,sans-serif;text-align:center;color:#ffd23f;line-height:1.2}
+#aMsg.ok{color:#7ff3b4}
+#aGo{font-size:2.4em;align-self:center;padding:.3em 1.6em .38em}
+.alinks{text-align:center;font:500 1.8em Fredoka,sans-serif}
+.alinks a{color:#7ff3ff;text-decoration:underline;cursor:pointer}
+.ahint{text-align:center;font:500 1.4em Fredoka,sans-serif;color:#b9d8c8}
+#aBack{font-size:1.6em;align-self:center;padding:.2em 1.2em .26em}
+.acard.shk{animation:ashk .3s}@keyframes ashk{25%{transform:translate(-52%,-50%)}75%{transform:translate(-48%,-50%)}}
 </style>
 </head>
 <body>
@@ -164,6 +183,18 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
     </div>
     <div class="row"><button class="btn ghost" id="back">Back</button><button class="btn" id="start">Start</button></div>
   </div>
+  <div id="auth" class="scr hide"><div class="acard" id="acard">
+    <div class="atabs"><button id="tUp" class="on">Sign up</button><button id="tIn" class="lk">&#128274; Sign in</button></div>
+    <input id="fName" placeholder="Your name" maxlength="16" autocomplete="nickname">
+    <input id="fMail" type="email" placeholder="Email" autocomplete="email" autocapitalize="off">
+    <input id="fPass" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password">
+    <div id="aMsg"></div>
+    <button class="btn" id="aGo">Create account</button>
+    <div class="alinks"><a id="aForgot">Forgot password?</a></div>
+    <div class="ahint">Reset email not in your inbox? Check your spam folder.</div>
+    <button class="btn ghost" id="aBack">Back</button>
+  </div></div>
+  <div id="who"></div>
 </div>
 <button id="snd" aria-label="Sound">🔊</button>
 <button id="home" aria-label="Main menu"><svg viewBox="0 0 48 48"><path d="M24 8 L5 25 H11 V40 H20 V29 H28 V40 H37 V25 H43 Z"/></svg></button>
@@ -235,7 +266,7 @@ function reset(){
   foes=FOES.map(a=>({k:a[0],x:a[1],y:a[2],a:a[3],b:a[4],d:a[5],alive:true,dead:0}));
   hpick=HEARTS.map(a=>({x:a[0],y:a[1],got:false}));
 }
-function init(){plats.forEach(q=>{if(!q.f)mkPlat(q)});LVD[2]=buildL2();LVD[2].plats.forEach(q=>{if(!q.f)mkPlat(q)});reset();buildUI();requestAnimationFrame(loop)}
+function init(){plats.forEach(q=>{if(!q.f)mkPlat(q)});LVD[2]=buildL2();LVD[2].plats.forEach(q=>{if(!q.f)mkPlat(q)});reset();buildUI();authInit();requestAnimationFrame(loop)}
 // ---- input ----
 const keys={},touch={};
 const go=()=>{if(state==='over'||state==='win'){const atB=state==='over'&&boss.on;if(state==='win')LV=1;reset();if(atB){p.x=6820;p.y=290;camX=6560;safe={x:6820,y:290}}state='play'}else if(state==='pause')state='play'};
@@ -496,10 +527,10 @@ let lastUI='';
 let lastP=-1;
 function syncPad(){const tn=ammo+bossNuts,k=tn*100+power;if(k===lastP)return;lastP=k;const b=$('bp');b.style.setProperty('--p',power/NUT_NEED);b.classList.toggle('full',tn>0);$('bpc').textContent=tn}
 function syncUI(){const pb=$('pause');pb.style.display=(state==='play'||state==='pause')?'grid':'none';$('home').style.display=(state==='play'||state==='pause'||state==='over'||state==='win')?'grid':'none';pb.classList.toggle('paused',state==='pause');if(state===lastUI)return;lastUI=state;const m=state==='title'||state==='select';$('wrap').classList.toggle('menu',m);$('ui').classList.toggle('off',!m);$('title').classList.toggle('hide',state!=='title');$('select').classList.toggle('hide',state!=='select');if(m)$('wal').textContent=wallet}
-function showSelect(){if(state!=='title')return;state='select';sfx('click')}
+function showSelect(){if(state!=='title')return;if(!AUTH.user){sfx('click');openAuth();return}state='select';sfx('click')}
 function startRun(){if(state!=='select')return;sfx('click');LV=1;reset();state='play'}
 function toTitle(){state='title';tr.on=false}
-function endRun(s){if(state!=='play')return;state=s;wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}}
+function endRun(s){if(state!=='play')return;state=s;wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}cloudSave(s,score)}
 const LOCK='<svg viewBox="0 0 64 64"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#dfe6ee" stroke-width="6" stroke-linecap="round"/><rect x="12" y="28" width="40" height="28" rx="8" fill="#e9b949" stroke="#7a4a0a" stroke-width="3"/><circle cx="32" cy="41" r="4" fill="#7a4a0a"/></svg>';
 const HEROES=[{n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]]},0,0,0];
 function showHero(i){const h=HEROES[i];$('pName').textContent=h.n;$('pRole').textContent=h.role;$('bars').innerHTML=h.st.map(a=>`<div class="bar"><span>${a[0]}</span><i><b style="width:${a[1]*100}%"></b></i></div>`).join('');document.querySelectorAll('.tile').forEach((t,k)=>t.classList.toggle('on',k===i))}
@@ -512,10 +543,88 @@ function buildUI(){
   showHero(0);
   document.querySelectorAll('.tile').forEach((c,i)=>c.addEventListener('click',()=>{if(HEROES[i]){showHero(i);$('note').textContent='More heroes are on the way';sfx('click')}else{sfx('nope');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');$('note').textContent='Locked. Heroes will unlock with coins soon.'}}));
   $('play').onclick=showSelect;$('start').onclick=startRun;$('back').onclick=()=>{state='title';sfx('click')};
-  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(x){}}toTitle();sfx('click')});
+  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(x){}cloudSave('quit',score)}toTitle();sfx('click')});
   $('pause').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play')state='pause';else if(state==='pause')state='play'});
   if(COARSE)$('hint').textContent='Tap PLAY - the game goes fullscreen (landscape)';
   $('snd').onclick=()=>{AU.on=!AU.on;if(AU.master)AU.master.gain.value=AU.on?1:0;$('snd').textContent=AU.on?'🔊':'🔇';auStart()};
+}
+// ----- login / sign up -----
+const FIREBASE_CONFIG={apiKey:"AIzaSyC57707Adc69Vt1yO4Xf8B1E1WMe_0tQbs",authDomain:"runmaster-79153.firebaseapp.com",projectId:"runmaster-79153",storageBucket:"runmaster-79153.firebasestorage.app",messagingSenderId:"534179013514",appId:"1:534179013514:web:78b8c07a47cbb06e065e73",measurementId:"G-7Y9V5M3RCQ"}; // paste the Firebase web config object here to turn on real email accounts + reset emails
+const AUTH={user:null,mode:'up',live:false};
+const LS={g:k=>{try{return localStorage.getItem(k)}catch(e){return null}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},d:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+async function hashPw(p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('oakie:'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'x'+btoa(p)}}
+const accs=()=>{try{return JSON.parse(LS.g('gw_acc')||'{}')}catch(e){return{}}};
+let FB=null,DB=null,CSYNC=null,BEST=0,MAXLV=1;
+const FV=()=>FB.firestore.FieldValue;
+async function cloudLogin(){
+  if(!DB||!FB||!FB.auth().currentUser||!AUTH.user)return;
+  const u=FB.auth().currentUser;if(CSYNC===u.uid)return;CSYNC=u.uid;
+  const ref=DB.collection('users').doc(u.uid);
+  try{
+    const sn=await ref.get();
+    if(sn.exists){const d=sn.data();wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;
+      await ref.set({name:AUTH.user.name,email:u.email,lastLogin:FV().serverTimestamp(),loginCount:FV().increment(1)},{merge:true})}
+    else{wallet=0;BEST=0;MAXLV=1;
+      await ref.set({name:AUTH.user.name,email:u.email,createdAt:FV().serverTimestamp(),lastLogin:FV().serverTimestamp(),loginCount:1,coins:0,bestScore:0,runs:0,wins:0,maxLevel:1,hero:0})}
+    LS.s('gw_coins',wallet);
+  }catch(e){CSYNC=null}
+}
+function cloudSave(how,sc){
+  if(!DB||!CSYNC)return;
+  try{
+    const d={coins:wallet,lastPlayed:FV().serverTimestamp(),runs:FV().increment(1)};
+    if(sc>BEST){BEST=sc;d.bestScore=BEST}
+    if(typeof LV==='number'&&LV>MAXLV){MAXLV=LV;d.maxLevel=LV}
+    if(how==='win')d.wins=FV().increment(1);
+    DB.collection('users').doc(CSYNC).set(d,{merge:true}).catch(()=>{});
+  }catch(e){}
+}
+const BE={
+  async signup(n,m,p){if(FB){const c=await FB.auth().createUserWithEmailAndPassword(m,p);await c.user.updateProfile({displayName:n});return{name:n,email:m}}
+    const a=accs();if(a[m])throw{code:'auth/email-already-in-use'};a[m]={name:n,h:await hashPw(p)};LS.s('gw_acc',JSON.stringify(a));return{name:n,email:m}},
+  async signin(m,p){if(FB){const c=await FB.auth().signInWithEmailAndPassword(m,p);return{name:c.user.displayName||m.split('@')[0],email:m}}
+    const a=accs()[m];if(!a||a.h!==await hashPw(p))throw{code:'auth/invalid-credential'};return{name:a.name,email:m}},
+  async reset(m){if(FB){await FB.auth().sendPasswordResetEmail(m);return}throw{code:'local/noreset'}},
+  async out(){if(FB)try{await FB.auth().signOut()}catch(e){}}
+};
+const ERR={'auth/email-already-in-use':'That email already has an account. Please sign in.','auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs at least 6 characters.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No internet connection.','local/noreset':'Reset emails need the online setup. Not switched on yet.'};
+function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');wallet=0;BEST=0;MAXLV=1;CSYNC=null}drawWho()}
+function drawWho(){const w=$('who');if(!w)return;const show=AUTH.user&&(state==='title'||state==='select');w.style.display=show?'block':'none';if(show)w.innerHTML='&#128100; '+AUTH.user.name.replace(/[<>&]/g,'')+'<small>logged in</small>'}
+function aMsg(t,ok){const m=$('aMsg');m.textContent=t||'';m.className=ok?'ok':''}
+function aShake(){const c=$('acard');c.classList.remove('shk');void c.offsetWidth;c.classList.add('shk');sfx('nope')}
+function aMode(m){AUTH.mode=m;const up=m==='up',rs=m==='reset';
+  $('tUp').classList.toggle('on',up);$('tIn').classList.toggle('on',m==='in'||rs);
+  $('fName').style.display=up?'':'none';$('fPass').style.display=rs?'none':'';
+  $('fPass').autocomplete=up?'new-password':'current-password';
+  $('aGo').textContent=up?'Create account':rs?'Send reset link':'Sign in';
+  $('aForgot').textContent=rs?'Back to sign in':'Forgot password?';$('aForgot').style.display=up?'none':'';
+  $('tIn').innerHTML=LS.g('gw_has')==='1'?'Sign in':'&#128274; Sign in';$('tIn').classList.toggle('lk',LS.g('gw_has')!=='1');aMsg('')}
+function openAuth(){aMode(LS.g('gw_has')==='1'?'in':'up');$('auth').classList.remove('hide')}
+function closeAuth(){$('auth').classList.add('hide');document.activeElement&&document.activeElement.blur&&document.activeElement.blur()}
+async function aSubmit(){
+  const n=$('fName').value.trim(),m=$('fMail').value.trim().toLowerCase(),p=$('fPass').value;
+  if(AUTH.mode==='up'&&n.length<2)return aMsg('Please enter your name.'),aShake();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))return aMsg('Please enter a valid email.'),aShake();
+  if(AUTH.mode!=='reset'&&p.length<6)return aMsg('Password needs at least 6 characters.'),aShake();
+  const b=$('aGo');b.disabled=true;aMsg('Please wait...',true);
+  try{
+    if(AUTH.mode==='reset'){await BE.reset(m);aMsg('Reset link sent! Check your inbox - and your spam folder.',true)}
+    else{const u=await(AUTH.mode==='up'?BE.signup(n,m,p):BE.signin(m,p));LS.s('gw_has','1');setUser(u);closeAuth();sfx('charged');showSelect()}
+  }catch(e){const c=e&&e.code;if(c==='auth/email-already-in-use'){LS.s('gw_has','1');aMode('in');}aMsg(ERR[c]||'Something went wrong. Try again.');aShake()}
+  b.disabled=false}
+function authInit(){
+  try{const u=JSON.parse(LS.g('gw_user')||'null');if(u)AUTH.user=u}catch(e){}
+  $('tUp').onclick=()=>{aMode('up');sfx('click')};
+  $('tIn').onclick=()=>{if(LS.g('gw_has')!=='1'){aMsg('Sign in unlocks after you create your account.');aShake();return}aMode('in');sfx('click')};
+  $('aGo').onclick=aSubmit;$('aBack').onclick=()=>{closeAuth();sfx('click')};
+  $('aForgot').onclick=()=>{aMode(AUTH.mode==='reset'?'in':'reset');sfx('click')};
+  $('auth').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();aSubmit()}});
+  $('auth').addEventListener('keyup',e=>e.stopPropagation());
+  $('who').onclick=()=>{if(confirm('Log out '+AUTH.user.name+'?')){BE.out();setUser(null);sfx('click')}};
+  setInterval(drawWho,250);drawWho();
+  if(FIREBASE_CONFIG){const src=['app','auth','firestore','analytics'].map(n=>'https://www.gstatic.com/firebasejs/10.12.2/firebase-'+n+'-compat.js');let i=0;
+    const nx=()=>{if(i>=src.length){FB=firebase;FB.initializeApp(FIREBASE_CONFIG);try{DB=FB.firestore()}catch(e){}try{FB.analytics()}catch(e){}FB.auth().onAuthStateChanged(u=>{if(u){setUser({name:u.displayName||u.email.split('@')[0],email:u.email});cloudLogin()}else if(LS.g('gw_user'))setUser(null)});return}
+      const e=document.createElement('script');e.src=src[i++];e.onload=nx;document.head.appendChild(e)};nx()}
 }
 // ----- audio engine (all synthesised, no files) -----
 const AU={ctx:null,on:true,cur:null,name:null};
