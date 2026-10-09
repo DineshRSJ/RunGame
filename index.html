@@ -205,19 +205,24 @@ function mkPlat(q){
   q.c=c;
 }
 function buildL2(){
-  const P=[[0,370,950],[1150,370,520],[1900,340,460],[2560,370,420],[3200,350,380],[3780,370,500],[4500,340,420],[5120,370,460],[5800,350,380],[6380,370,360],[6700,370,1060],[2660,215,160,1],[4630,205,160,1],[5870,210,150,1]];
-  const pl=P.map(a=>({x:a[0],y:a[1],w:a[2],f:!!a[3],dx:0,dy:0}));
-  [{x:1730,y:350,w:110,ax:'y',r:30,sp:.035,ph:0},{x:4350,y:345,w:100,ax:'x',r:35,sp:.045,ph:0},{x:6240,y:335,w:110,ax:'y',r:45,sp:.04,ph:0}].forEach(m=>pl.push({x:m.x,y:m.y,w:m.w,f:true,mv:m,x0:m.x,y0:m.y,dx:0,dy:0}));
+  /* LEVEL 2 - fairness rules: every platform has >=100px landing room, >=140px between obstacles, >=180px clear run-up before a gap; gaps 210 (240 with a moving platform). Checked with a physics simulation, incl. a sloppy-player test. */
+  const P=[[0,950,370],[1160,660,370],[2060,640,340],[2910,640,370],[3790,640,350],[4640,700,370],[5580,640,340],[6430,310,370]];
+  const pl=P.map(a=>({x:a[0],y:a[2],w:a[1],f:false,dx:0,dy:0}));
+  const pads=[2110,3830,5630].map(x=>({x,y:P.find(a=>x>=a[0]&&x<=a[0]+a[1])[2]}));
+  const FL=pads.map(p=>({x:p.x+50,y:p.y-145,w:160,f:true,dx:0,dy:0}));FL.forEach(q=>pl.push(q));
+  [[1,110,'y',25,.035],[3,100,'x',35,.045],[5,110,'y',25,.04]].forEach(m=>{const a=P[m[0]],b=P[m[0]+1],gx=a[0]+a[1],x=gx+(b[0]-gx-m[1])/2,y=(a[2]+b[2])/2;
+    pl.push({x,y,w:m[1],f:true,mv:{x,y,w:m[1],ax:m[2],r:m[3],sp:m[4],ph:0},x0:x,y0:y,dx:0,dy:0})});
   pl.push({x:6850,y:240,w:170,f:true,art:"arenaIsl",dx:0,dy:0},{x:7450,y:240,w:170,f:true,art:"arenaIsl",dx:0,dy:0});
-  const haz=[[700,370],[810,370],[1500,370],[2310,340],[2880,370],[3530,350],[4050,370],[5500,370],[6090,350]];
-  const C=[],near=x=>haz.some(z=>Math.abs(z[0]-x)<55);
-  P.slice(0,10).forEach(a=>{for(let x=a[0]+90;x<=a[0]+a[2]-90;x+=55)if(!near(x))C.push([x,a[1]-48])});
+  pl.push({x:6700,y:370,w:1060,f:false,dx:0,dy:0});
+  const haz=[[700,370],[1590,370],[3340,370],[4010,350],[5110,370],[5930,340]];
+  const C=[],near=x=>haz.some(z=>Math.abs(z[0]-x)<55)||[[360,510],[2350,2500],[4790,4940]].some(l=>x>l[0]-30&&x<l[1]+30);
+  P.forEach(a=>{for(let x=a[0]+90;x<=a[0]+a[1]-90;x+=55)if(!near(x))C.push([x,a[2]-48])});
   haz.forEach(z=>C.push([z[0]-45,z[1]-88],[z[0],z[1]-122],[z[0]+45,z[1]-88]));
-  for(let i=0;i<9;i++){const a=P[i],b=P[i+1],gx=(a[0]+a[2]+b[0])/2,gy=Math.min(a[1],b[1])-125;C.push([gx-45,gy+35],[gx,gy],[gx+45,gy+35])}
-  for(let x=5895;x<=6015;x+=40)C.push([x,162]);
-  return{plats:pl,pads:[{x:2610,y:370},{x:4560,y:340},{x:5840,y:350}],FLY:C,
-    FOES:[["frog",1400,370,1230,1620,1],["beetle",2100,340,1960,2300,-1],["frog",2780,370,2640,2940,-1],["beetle",3420,350,3260,3540,1],["frog",3950,370,3830,4230,1],["beetle",4660,340,4600,4720,-1],["frog",5300,370,5150,5540,1],["frog",5980,350,5840,6140,-1]],
-    HEARTS:[[2740,170],[4710,160]],HAZ:haz,BR:[[450,370,150],[2080,340,150],[3320,350,150],[4750,340,150],[5280,370,150]]}}
+  for(let i=0;i<7;i++){const a=P[i],b=P[i+1],gx=(a[0]+a[1]+b[0])/2,gy=Math.min(a[2],b[2])-125;C.push([gx-45,gy+35],[gx,gy],[gx+45,gy+35])}
+  FL.forEach(f=>{for(let x=f.x+30;x<=f.x+f.w-30;x+=40)C.push([x,f.y-48])});
+  return{plats:pl,pads,FLY:C,
+    FOES:[["frog",1340,370,1290,1390,1],["beetle",3090,370,3060,3120,1]],
+    HEARTS:[[FL[0].x+80,FL[0].y-45],[FL[2].x+80,FL[2].y-45]],HAZ:haz,BR:[[360,370,150],[2350,340,150],[4790,370,150]]}}
 function applyLevel(n){LV=n;const d=LVD[n];plats=d.plats;pads=d.pads;FLY=d.FLY;FOES=d.FOES;HEARTS=d.HEARTS;HAZ=d.HAZ;BR=d.BR}
 function startTrans(){if(state!=='play')return;state='trans';tr={on:true,t:0};sfx('charged')}
 function transUpdate(){tr.t++;
