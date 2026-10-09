@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>RunMaster - Owner Stats</title>
+<style>
+:root{--bg:#f4f7f5;--card:#fff;--tx:#14231a;--mut:#5b6b61;--ac:#12a468;--bd:#d8e3dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1a12;--card:#10261a;--tx:#eafff3;--mut:#9bb8a8;--bd:#1f4030}}
+:root[data-theme="dark"]{--bg:#0a1a12;--card:#10261a;--tx:#eafff3;--mut:#9bb8a8;--bd:#1f4030}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;padding-top:max(16px,env(safe-area-inset-top))}
+h1{margin:0 0 4px;font-size:1.5rem}h2{font-size:1.05rem;margin:0 0 10px}
+.sub{color:var(--mut);margin:0 0 16px;font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px;max-width:960px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.k{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.k b{display:block;font-size:1.7rem;color:var(--ac)}.k span{color:var(--mut);font-size:.82rem}
+input,button{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);width:100%;margin-bottom:8px}
+button{background:var(--ac);color:#fff;border:0;font-weight:600;cursor:pointer}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+#msg{color:#d33;min-height:1.2em;font-size:.9rem}
+.wrap{max-width:960px}
+.login{max-width:380px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+th{color:var(--mut);font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:3px;height:120px}
+.bars div{flex:1;background:var(--ac);border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.axis{display:flex;justify-content:space-between;color:var(--mut);font-size:.75rem;margin-top:4px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>RunMaster - Owner Stats</h1>
+<p class="sub">Private page. Only the owner account can see the numbers.</p>
+
+<div id="loginBox" class="card login">
+  <h2>Owner sign in</h2>
+  <input id="em" type="email" placeholder="Owner email" autocomplete="email">
+  <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="go">Sign in</button>
+  <div id="msg"></div>
+</div>
+
+<div id="dash" class="hide">
+  <div class="card"><div class="grid" id="kpis"></div></div>
+  <div class="card"><h2>New sign-ups, last 30 days</h2><div class="bars" id="bars"></div><div class="axis"><span>30 days ago</span><span>today</span></div></div>
+  <div class="card"><h2>Top 10 by coins</h2><div class="scroll"><table id="top"></table></div></div>
+  <div class="card"><h2>Latest 20 players</h2><div class="scroll"><table id="recent"></table></div></div>
+  <button class="g" id="refresh">Refresh numbers</button>
+  <button class="g" id="out">Sign out</button>
+  <p class="sub">Each refresh reads every player record once (counts toward the free Firebase daily limit).</p>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const CFG={apiKey:"AIzaSyC57707Adc69Vt1yO4Xf8B1E1WMe_0tQbs",authDomain:"runmaster-79153.firebaseapp.com",projectId:"runmaster-79153",storageBucket:"runmaster-79153.firebasestorage.app",messagingSenderId:"534179013514",appId:"1:534179013514:web:78b8c07a47cbb06e065e73",measurementId:"G-7Y9V5M3RCQ"};
+const $=id=>document.getElementById(id);
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+firebase.initializeApp(CFG);
+const auth=firebase.auth(),db=firebase.firestore();
+const DAY=864e5;
+const ms=v=>v&&v.toMillis?v.toMillis():null;
+const fmt=v=>{const m=ms(v);return m?new Date(m).toLocaleDateString():'-'};
+
+async function load(){
+  $('msg').textContent='';
+  let snap;
+  try{snap=await db.collection('users').get()}
+  catch(e){
+    $('dash').classList.add('hide');$('loginBox').classList.remove('hide');
+    $('msg').textContent='Access denied. This account is not the owner, or the Firestore rules are not set yet.';
+    return}
+  $('loginBox').classList.add('hide');$('dash').classList.remove('hide');
+  const now=Date.now(),U=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+  const n=U.length;
+  const created=u=>ms(u.createdAt),seen=u=>ms(u.lastLogin)||ms(u.lastPlayed)||created(u);
+  const cnt=f=>U.filter(f).length;
+  const act=d=>cnt(u=>seen(u)&&now-seen(u)<=d*DAY);
+  const coins=U.reduce((a,u)=>a+(+u.coins||0),0);
+  const runs=U.reduce((a,u)=>a+(+u.runs||0),0);
+  const wins=U.reduce((a,u)=>a+(+u.wins||0),0);
+  const returning=cnt(u=>(+u.loginCount||0)>=2);
+  const K=[
+    ['Total players',n],
+    ['Active today (24h)',act(1)],['Active this week',act(7)],['Active this month',act(30)],
+    ['New this week',cnt(u=>created(u)&&now-created(u)<=7*DAY)],
+    ['New this month',cnt(u=>created(u)&&now-created(u)<=30*DAY)],
+    ['Inactive 30+ days',n-act(30)],['Inactive 90+ days',n-act(90)],
+    ['Came back (2+ logins)',returning],
+    ['Total runs played',runs],['Bosses defeated',wins],
+    ['Coins held (all players)',coins],['Avg coins per player',n?Math.round(coins/n):0]
+  ];
+  $('kpis').innerHTML=K.map(k=>`<div class="k"><b>${k[1].toLocaleString()}</b><span>${k[0]}</span></div>`).join('');
+  // signups per day
+  const b=new Array(30).fill(0);
+  U.forEach(u=>{const c=created(u);if(!c)return;const i=29-Math.floor((now-c)/DAY);if(i>=0&&i<30)b[i]++});
+  const mx=Math.max(1,...b);
+  $('bars').innerHTML=b.map(v=>`<div title="${v}" style="height:${v/mx*100}%"></div>`).join('');
+  const row=(a,h)=>`<tr>${a.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`;
+  const head=a=>`<tr>${a.map(x=>`<th>${x}</th>`).join('')}</tr>`;
+  const top=[...U].sort((a,c)=>(+c.coins||0)-(+a.coins||0)).slice(0,10);
+  $('top').innerHTML=head(['Name','Coins','Best run','Runs','Last seen'])+top.map(u=>row([u.name,u.coins||0,u.bestScore||0,u.runs||0,fmt(u.lastLogin||u.lastPlayed)])).join('');
+  const rec=[...U].sort((a,c)=>(created(c)||0)-(created(a)||0)).slice(0,20);
+  $('recent').innerHTML=head(['Name','Email','Joined','Last seen','Logins'])+rec.map(u=>row([u.name,u.email,fmt(u.createdAt),fmt(u.lastLogin),u.loginCount||0])).join('');
+}
+
+$('go').onclick=async()=>{
+  $('msg').textContent='';
+  try{await auth.signInWithEmailAndPassword($('em').value.trim(),$('pw').value)}
+  catch(e){$('msg').textContent='Wrong email or password.'}
+};
+$('refresh').onclick=load;
+$('out').onclick=()=>auth.signOut();
+auth.onAuthStateChanged(u=>{
+  if(u)load();
+  else{$('dash').classList.add('hide');$('loginBox').classList.remove('hide')}
+});
+</script>
+</body>
+</html>
