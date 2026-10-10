@@ -1,5 +1,5 @@
 // Simple helper: always try the internet first, fall back to the saved copy when offline.
-const C='glowwood-v1';
+const C='runmaster-v1';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./index.html','./manifest.json','./icon-192.png','./icon-512.png'])).catch(()=>{}))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{

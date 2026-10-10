@@ -1,7 +1,7 @@
 {
- "name": "Oakie's Glowwood Run",
- "short_name": "Glowwood Run",
- "description": "Run, jump and throw nuts with Oakie through Glowwood.",
+ "name": "RunMaster",
+ "short_name": "RunMaster",
+ "description": "Run, jump and throw nuts with Oakie.",
  "start_url": "./index.html",
  "scope": "./",
  "display": "fullscreen",
