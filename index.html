@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="screen-orientation" content="landscape">
 <meta name="theme-color" content="#0a1a12">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Nutkin's Jungle Run</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -427,7 +430,7 @@ function drawPad(f){const x=f.x-camX,sq=f.pop?.75+(14-f.pop)*.018:1;g.save();g.t
   let gr=g.createRadialGradient(-8,-44,4,0,-30,36);gr.addColorStop(0,'#9bf3ff');gr.addColorStop(.6,'#2fb5d9');gr.addColorStop(1,'#1b7aa8');g.fillStyle=gr;g.beginPath();g.ellipse(0,-30,34,20,0,Math.PI,0);g.lineTo(34,-28);g.quadraticCurveTo(0,-20,-34,-28);g.fill();g.strokeStyle='#0e4a6a';g.stroke();
   g.fillStyle='#e8ffff';[[-16,-38,5],[6,-45,4],[18,-34,4]].forEach(a=>{g.beginPath();g.arc(a[0],a[1],a[2],0,7);g.fill()});g.restore()}
 function drawFly(f){if(f.got)return;const x=f.x-camX,y=f.y+Math.sin(t/20+f.x)*5;if(x<-30||x>VW+30)return;
-  g.save();g.globalCompositeOperation='lighter';const r=g.createRadialGradient(x,y,2,x,y,26);r.addColorStop(0,'#ffe27a88');r.addColorStop(1,'#ffb02000');g.fillStyle=r;g.fillRect(x-26,y-26,52,52);g.restore();
+  g.save();g.globalCompositeOperation='lighter';g.drawImage(glow('coin',52,52,26,26,2,26,'#ffe27a88'),x-26,y-26);g.restore();
   const sx=Math.max(.14,Math.abs(Math.cos(t/16+f.x*.05)));g.drawImage(IM.coin,x-15*sx,y-15,30*sx,30)}
 function drawFoe(e){const x=e.x-camX;if(x<-120||x>VW+120)return;const flip=e.d>0?-1:1,hy=e.hy||0;
   if(e.k==='frog'){const im=e.hop?IM.frogAir:IM.frogSit;
@@ -447,8 +450,10 @@ function drawHero(){
   else if(p.th>0&&p.hurtT<=0){const k=p.th>14?'windup':p.th>7?'throw':'follow';sp(IM[k],cx,fy+3,IM[k].height*HS,p.face,sx,sy,k==='windup'?.52:k==='throw'?.45:.5)}
   else sp(im,cx,fy+bob+3,104,p.face,sx,sy,.62);
 }
+const GLC={};
+function glow(key,w,h,cx,cy,r0,r1,col){let c=GLC[key];if(c)return c;c=document.createElement('canvas');c.width=Math.ceil(w);c.height=Math.ceil(h);const x=c.getContext('2d'),gr=x.createRadialGradient(cx,cy,r0,cx,cy,r1);gr.addColorStop(0,col);gr.addColorStop(1,col.slice(0,7)+'00');x.fillStyle=gr;x.fillRect(0,0,w,h);return GLC[key]=c}
 function drawHaz(z){const x=z[0]-camX,y=z[1];if(x<-100||x>VW+100)return;const w=108,h=w*IM.spike.height/IM.spike.width;
-  g.save();g.globalCompositeOperation='lighter';g.globalAlpha=.16+.07*Math.sin(t/14);const r=g.createRadialGradient(x,y-h*.4,4,x,y-h*.4,w*.75);r.addColorStop(0,'#ff7a5a');r.addColorStop(1,'#ff7a5a00');g.fillStyle=r;g.fillRect(x-w,y-h*1.4,w*2,h*1.8);g.restore();
+  g.save();g.globalCompositeOperation='lighter';g.globalAlpha=.16+.07*Math.sin(t/14);g.drawImage(glow('haz',w*2,h*1.8,w,h*1.0,4,w*.75,'#ff7a5aff'),x-w,y-h*1.4);g.restore();
   g.drawImage(IM.spike,x-w/2,y-h+4,w,h)}
 function drawNut(n){const x=n.x-camX;if(x<-30||x>VW+30)return;
   g.save();g.translate(x,n.y);g.globalCompositeOperation='lighter';const gl=g.createRadialGradient(0,0,2,0,0,22);gl.addColorStop(0,'#ffd23f99');gl.addColorStop(1,'#ffd23f00');g.fillStyle=gl;g.fillRect(-22,-22,44,44);g.globalCompositeOperation='source-over';
@@ -457,7 +462,7 @@ function drawNut(n){const x=n.x-camX;if(x<-30||x>VW+30)return;
   g.fillStyle='#5b3a1c';g.beginPath();g.ellipse(0,-5,12,7,0,Math.PI,0);g.fill();g.stroke();g.fillRect(-1.5,-15,3,5);
   g.fillStyle='#ffffff90';g.beginPath();g.ellipse(-4,3,2.2,4,.3,0,7);g.fill();g.restore()}
 function drawHP(h){if(h.got)return;const x=h.x-camX,y=h.y+Math.sin(t/18+h.x)*5;if(x<-40||x>VW+40)return;
-  g.save();g.globalCompositeOperation='lighter';const r=g.createRadialGradient(x,y,2,x,y,34);r.addColorStop(0,'#ff6b8a99');r.addColorStop(1,'#ff6b8a00');g.fillStyle=r;g.fillRect(x-34,y-34,68,68);g.restore();
+  g.save();g.globalCompositeOperation='lighter';g.drawImage(glow('hp',68,68,34,34,2,34,'#ff6b8a99'),x-34,y-34);g.restore();
   const hh=44*(1+Math.sin(t/12)*.05),ww=hh*IM.heart.width/IM.heart.height;g.drawImage(IM.heart,x-ww/2,y-hh/2,ww,hh)}
 function hud(){drawBossBar();
   g.save();g.beginPath();g.arc(46,48,30,0,7);g.fillStyle='#f4d58a';g.fill();g.lineWidth=5;g.strokeStyle='#5a3c1e';g.stroke();g.clip();g.drawImage(IM.idle,10,14,70,70*IM.idle.height/IM.idle.width,);g.restore();
@@ -508,7 +513,6 @@ function draw(){
   const menu=state==='title'||state==='select';drawBG();
   if(!menu){g.save();g.translate(shake>0?(Math.random()-.5)*shake*.5:0,TY+camV+(shake>0?(Math.random()-.5)*shake*.5:0));g.scale(Z,Z);drawPlats();if(LV===1)drawTunnel();BR.forEach(drawBranch);pads.forEach(drawPad);HAZ.forEach(drawHaz);flies.forEach(drawFly);hpick.forEach(drawHP);foes.forEach(drawFoe);drawBoss();waves.forEach(drawWave);sup.forEach(drawSup);quake.forEach(drawQuake);nuts.forEach(drawNut);drawHero();
   ps.forEach(a=>{g.globalAlpha=Math.min(1,a.l/20);g.fillStyle=a.c;g.beginPath();g.arc(a.x-camX,a.y,a.r,0,7);g.fill()});g.globalAlpha=1;g.restore()}
-  if(LV===2&&!menu){g.save();g.globalCompositeOperation='multiply';g.fillStyle='#b9a6f2';g.fillRect(0,0,W,H);g.restore()}
   const v=g.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*1.0);v.addColorStop(0,'#0000');v.addColorStop(1,'#04140c66');g.fillStyle=v;g.fillRect(0,0,W,H);
   if(!menu)hud();
   if(tr.on){const k=tr.t,a=k<50?k/50:k<150?1:Math.max(0,1-(k-150)/55);g.fillStyle='rgba(4,12,8,'+a+')';g.fillRect(0,0,W,H);
@@ -690,6 +694,7 @@ function stopTrack(){const c=AU.cur;if(!c)return;c.dead=true;c.timers.forEach(x=
   setTimeout(()=>{c.src.forEach(s=>{try{s.stop()}catch(e){}});try{c.tg.disconnect();c.tg.rv.disconnect()}catch(e){}},900);AU.cur=null}
 function setTrack(n){if(!AU.ctx||AU.name===n)return;stopTrack();AU.name=n;const C=AU.ctx,tg=C.createGain();tg.gain.setValueAtTime(0,C.currentTime);tg.gain.linearRampToValueAtTime(1,C.currentTime+1.2);tg.connect(AU.master);
   tg.rv=C.createGain();tg.rv.gain.value=n==='menu'?.25:.9;tg.rv.connect(AU.rev);const cur=AU.cur={tg,timers:[],src:[]};(n==='menu'?menuTrack:gameTrack)(cur,C)}
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
