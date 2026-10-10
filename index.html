@@ -268,7 +268,7 @@ function buildL2(){
 function applyLevel(n){LV=n;const d=LVD[n];plats=d.plats;pads=d.pads;FLY=d.FLY;FOES=d.FOES;HEARTS=d.HEARTS;HAZ=d.HAZ;BR=d.BR}
 function startTrans(){if(state!=='play')return;state='trans';tr={on:true,t:0};sfx('charged')}
 function transUpdate(){tr.t++;
-  if(tr.t===60){unlockSave();const sc=score,am=ammo+bossNuts,pw=power;LV=2;reset();score=sc;ammo=am;power=pw}
+  if(tr.t===60){unlockSave();bankLevel('level');const am=ammo+bossNuts,pw=power;LV=2;reset();ammo=am;power=pw}
   if(tr.t>=210){tr.on=false;state='play';msg={s:'Level 2: faster foes and wider gaps!',l:170}}}
 function reset(){
   applyLevel(LV);hearts=3;score=0;inv=0;ps=[];camX=0;
@@ -527,8 +527,8 @@ function draw(){
     const ta=k<45?0:k<140?Math.min(1,(k-45)/20):Math.max(0,1-(k-140)/18);
     if(ta>0){g.save();g.globalAlpha=ta;g.textAlign='center';g.lineJoin='round';g.font='700 84px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=12;g.strokeStyle='#3a2410';g.strokeText('LEVEL 2',W/2,H/2);g.fillStyle='#ffd23f';g.fillText('LEVEL 2',W/2,H/2);g.font='500 26px Fredoka,sans-serif';g.fillStyle='#fff3cf';g.fillText('The Twilight Canopy',W/2,H/2+46);g.restore()}}
   if(state==='pause')banner('Paused',['Tap the play button or press P to continue']);
-  if(state==='over')banner('Oh nuts!',['You collected '+score+' coins (total '+wallet+')','Press Space or tap to try again']);
-  if(state==='win')banner('Toad King defeated!',['Level 2 cleared!  Coins: '+score+' (total '+wallet+')','Press Space or tap to play again']);
+  if(state==='over')banner('Oh nuts!',['Coins from this try were not kept - finish the level to bank them','Press Space or tap to try again']);
+  if(state==='win')banner('Toad King defeated!',['Level 2 cleared!  +'+score+' coins banked (total '+wallet+')','Press Space or tap to play again']);
 }
 let last=performance.now(),acc=0;
 function loop(n){if(state==='play'&&PORTRAIT.matches)state='pause';acc+=Math.min(100,n-last);last=n;while(acc>=16.67){if(state==='play')update();else{t++;if(state==='trans')transUpdate()}acc-=16.67}if(state==='title'||state==='select')camX=(L-VW)*(.5+.5*Math.sin(t/420));syncUI();syncPad();if(AU.ctx&&AU.ctx.state==='running')setTrack(state==='title'||state==='select'?'menu':'game');draw();requestAnimationFrame(loop)}
@@ -542,7 +542,8 @@ function syncUI(){const pb=$('pause');pb.style.display=(state==='play'||state===
 function showSelect(){if(state!=='title')return;if(!AUTH.user){sfx('click');openAuth();return}state='select';sfx('click');if(SELLV>MAXLV)SELLV=1;drawLvs()}
 function startRun(){if(state!=='select')return;sfx('click');RUNCOL={1:[],2:[]};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
 function toTitle(){state='title';tr.on=false;RUNCOL={1:[],2:[]}}
-function endRun(s){if(state!=='play')return;state=s;wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(s,score)}
+function bankLevel(how){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(how,score)}
+function endRun(s){if(state!=='play')return;state=s;if(s==='win')bankLevel('win');else{RUNCOL={1:[],2:[]};cloudSave(s,0)}}
 const LOCK='<svg viewBox="0 0 64 64"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#dfe6ee" stroke-width="6" stroke-linecap="round"/><rect x="12" y="28" width="40" height="28" rx="8" fill="#e9b949" stroke="#7a4a0a" stroke-width="3"/><circle cx="32" cy="41" r="4" fill="#7a4a0a"/></svg>';
 const HEROES=[{n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]]},0,0,0];
 function showHero(i){const h=HEROES[i];$('pName').textContent=h.n;$('pRole').textContent=h.role;$('bars').innerHTML=h.st.map(a=>`<div class="bar"><span>${a[0]}</span><i><b style="width:${a[1]*100}%"></b></i></div>`).join('');document.querySelectorAll('.tile').forEach((t,k)=>t.classList.toggle('on',k===i))}
@@ -555,7 +556,7 @@ function buildUI(){
   showHero(0);
   document.querySelectorAll('.tile').forEach((c,i)=>c.addEventListener('click',()=>{if(HEROES[i]){showHero(i);$('note').textContent='More heroes are on the way';sfx('click')}else{sfx('nope');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');$('note').textContent='Locked. Heroes will unlock with coins soon.'}}));
   $('play').onclick=showSelect;$('start').onclick=startRun;$('back').onclick=()=>{state='title';sfx('click')};
-  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(x){}bankRun();cloudSave('quit',score)}toTitle();sfx('click')});
+  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){RUNCOL={1:[],2:[]};cloudSave('quit',0)}toTitle();sfx('click')});
   $('pause').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play')state='pause';else if(state==='pause')state='play'});
   if(COARSE)$('hint').textContent='Tap PLAY - the game goes fullscreen (landscape)';
   $('snd').onclick=()=>{AU.on=!AU.on;if(AU.master)AU.master.gain.value=AU.on?1:0;$('snd').textContent=AU.on?'🔊':'🔇';auStart()};
@@ -594,7 +595,7 @@ async function cloudLogin(){
 function cloudSave(how,sc){
   if(!DB||!CSYNC)return;
   try{
-    const d={coins:wallet,lastPlayed:FV().serverTimestamp(),runs:FV().increment(1)};
+    const d={coins:wallet,lastPlayed:FV().serverTimestamp(),runs:FV().increment(how==='level'?0:1)};
     if(sc>BEST){BEST=sc;d.bestScore=BEST}
     d.maxLevel=MAXLV;d.collected=COL;
     if(how==='win')d.wins=FV().increment(1);
