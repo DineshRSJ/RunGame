@@ -163,6 +163,12 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 #aBack{font-size:1.6em;align-self:center;padding:.2em 1.2em .26em}
 .acard.shk{animation:ashk .3s}@keyframes ashk{25%{transform:translate(-52%,-50%)}75%{transform:translate(-48%,-50%)}}
 
+/* ---- potions (character unlock currency) ---- */
+.pico{display:inline-block;width:.95em;height:.95em;vertical-align:-.14em;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10.2 2.4h3.6v3.3l3 5.1a5.9 5.9 0 1 1-9.6 0l3-5.1z' fill='%23d7a6ff' stroke='%23401a6a' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M9.6 2.2h4.8' stroke='%23a06a2a' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='10.2' cy='15.4' r='1.3' fill='%23fff' opacity='.85'/%3E%3C/svg%3E")}
+.ws{display:flex;gap:.6em;align-items:center}
+.tile .pk{position:absolute;left:0;right:0;bottom:0;font:700 1.15em Fredoka,sans-serif;color:#ffd23f;background:#04140ccc;text-align:center;padding:.14em 0 .22em}
+.tile .beta{position:absolute;top:.22em;left:.22em;font:700 .95em Fredoka,sans-serif;background:#45e39a;color:#04140c;border-radius:.6em;padding:.05em .35em;opacity:.92}
+.lv small .pico{margin-right:.05em}
 /* ---- title: PLAY + STORE row ---- */
 .menurow{position:absolute;left:50%;top:calc(var(--u,1px)*250);transform:translateX(-50%);display:flex;gap:2em;align-items:center;white-space:nowrap}
 .menurow .big{position:static;transform:none;animation:pulse2 1.6s ease-in-out infinite}
@@ -225,12 +231,12 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
     <div class="logo"><span class="l1" id="lg1"></span><span class="l2" id="lg2"></span></div>
     <div class="gnd" id="gnd"></div>
     <div class="sp" id="tHero"><img id="h1" alt=""><img id="h2" alt=""></div>
-    <div class="wal" id="twal"><span class="coin"></span><b id="twalN">0</b></div>
+    <div class="ws" id="twal"><div class="wal"><span class="coin"></span><b id="twalN">0</b></div><div class="wal"><i class="pico"></i><b id="tpwalN">0</b></div></div>
     <div class="menurow"><button class="btn big" id="play">PLAY</button><button class="btn store" id="storeBtn">STORE</button></div>
     <div id="hint">Tap anywhere to turn the music on</div>
   </div>
   <div id="select" class="scr hide">
-    <div class="top"><div class="ttl">Choose your hero</div><div class="wal"><span class="coin"></span><b id="wal">0</b></div></div>
+    <div class="top"><div class="ttl">Choose your hero</div><div class="ws"><div class="wal"><span class="coin"></span><b id="wal">0</b></div><div class="wal"><i class="pico"></i><b id="pwalN">0</b></div></div></div>
     <div class="stage"><div class="glow"></div><div class="shd"></div><img id="sHero" alt=""></div>
     <div class="panel">
       <div class="pname" id="pName"></div><div class="prole" id="pRole"></div>
@@ -242,7 +248,7 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
     <div class="row"><button class="btn ghost" id="back">Back</button><button class="btn" id="start">Start</button></div>
   </div>
   <div id="store" class="scr hide">
-    <div class="top"><div class="shead"><button class="btn ghost" id="sBack">&#9664; Back</button><div class="ttl">Store</div></div><div class="wal"><span class="coin"></span><b id="swal">0</b></div></div>
+    <div class="top"><div class="shead"><button class="btn ghost" id="sBack">&#9664; Back</button><div class="ttl">Store</div></div><div class="ws"><div class="wal"><span class="coin"></span><b id="swal">0</b></div><div class="wal"><i class="pico"></i><b id="spwalN">0</b></div></div></div>
     <div class="chars" id="schars"></div>
     <div class="stage"><div class="glow"></div><div class="shd"></div><canvas id="stCv" width="444" height="440"></canvas></div>
     <div class="spanel">
@@ -292,8 +298,11 @@ let pads=[{x:2420,y:330},{x:5460,y:370}];
 const rw=(x0,x1,y,st=45)=>{const a=[];for(let x=x0;x<=x1;x+=st)a.push([x,y]);return a};
 let FLY=[].concat(rw(180,380,322),rw(500,650,322),[[800,270],[850,225],[900,270]],[[1180,300]],rw(1330,1430,322),rw(1560,1700,322),[[1800,270],[1850,225],[1900,270]],rw(2330,2400,282),rw(2400,2500,162),rw(2700,2840,282),[[3100,300]],rw(3260,3400,322),[[3450,270],[3500,225],[3550,270]],rw(3640,3900,322,65),rw(4310,4390,300),rw(4650,4800,302),rw(4900,5050,302),[[5300,290]],rw(5440,5560,182),rw(5620,5680,322),[[5650,270],[5700,225],[5750,270]],[[6110,290],[6220,270],[6400,230],[6590,250]],rw(6150,6250,282,50),rw(6900,7000,192,50),rw(7500,7600,192,50),rw(7000,7400,322,100));
 let FOES=[["frog",1550,370,1440,1720,1],["frog",3700,370,3640,3960,-1],["beetle",4950,350,4880,5100,1],["frog",5900,370,5820,5990,-1]];
-let HEARTS=[[2460,165],[4000,310],[5490,185]],HAZ=[[850,370],[1850,370],[3500,370],[5700,370]];let LV=1;const LVD={};LVD[1]={plats,pads,FLY,FOES,HEARTS,HAZ,BR};let tr={on:false,t:0};
-let flies,foes,hearts,score,state='title',inv=0,t=0,safe,p,camX=0,ps=[],hpick=[];
+let HEARTS=[[2460,165],[4000,310],[5490,185]],HAZ=[[850,370],[1850,370],[3500,370],[5700,370]];let LV=1;const LVD={};
+// POTIONS = character-unlock collectibles. Hard, optional, one per spot, banked only when the level is finished.
+const POT1=[[2460,118],[3500,150],[6600,210]];
+LVD[1]={plats,pads,FLY,FOES,HEARTS,HAZ,BR,POT:POT1};let tr={on:false,t:0};
+let flies,foes,hearts,pots,score,state='title',inv=0,t=0,safe,p,camX=0,ps=[],hpick=[];
 const NUT_NEED=10;let ammo=0,bossNuts=0,sup=[],quake=[],jbuf=0,tipDJ=false;let power=0,nuts=[],nutCD=0,thh=false,camV=0,msg={s:'',l:0};
 const amb=Array.from({length:34},(_,i)=>({x:hash(i)*W*1.3,y:60+hash(i+7)*400,s:.3+hash(i+2)*.7,ph:hash(i+5)*6}));
 function mkPlat(q){
@@ -322,16 +331,19 @@ function buildL2(){
   FL.forEach(f=>{for(let x=f.x+30;x<=f.x+f.w-30;x+=40)C.push([x,f.y-48])});
   return{plats:pl,pads,FLY:C,
     FOES:[["frog",1340,370,1290,1390,1],["beetle",3090,370,3060,3120,1]],
-    HEARTS:[[FL[0].x+80,FL[0].y-45],[FL[2].x+80,FL[2].y-45]],HAZ:haz,BR:[[360,370,150],[2350,340,150],[4790,370,150]]}}
+    HEARTS:[[FL[0].x+80,FL[0].y-45],[FL[2].x+80,FL[2].y-45]],HAZ:haz,BR:[[360,370,150],[2350,340,150],[4790,370,150]],
+  POT:[[2240,100],[3960,110],[5760,100]]}}
 function applyLevel(n){LV=n;const d=LVD[n];plats=d.plats;pads=d.pads;FLY=d.FLY;FOES=d.FOES;HEARTS=d.HEARTS;HAZ=d.HAZ;BR=d.BR}
 function startTrans(){if(state!=='play')return;state='trans';tr={on:true,t:0};sfx('charged')}
 function transUpdate(){tr.t++;
   if(tr.t===60){unlockSave();bankLevel('level');const am=ammo+bossNuts,pw=power;LV=2;reset();ammo=am;power=pw}
-  if(tr.t>=210){tr.on=false;state='play';msg={s:'Level 2: faster foes and wider gaps!',l:170}}}
+  if(tr.t>=210){tr.on=false;state='play';
+    msg=JUSTUNLOCK?{s:JUSTUNLOCK+' IS UNLOCKED!',l:260}:{s:'Level 2: faster foes and wider gaps!',l:170}}}
 function reset(){
   applyLevel(LV);hearts=3;score=0;inv=0;ps=[];camX=0;
   p={x:60,y:290,w:40,h:80,vx:0,vy:0,ground:false,face:1,hurtT:0,land:0,air:1,coy:0,bounce:0,sl:0,th:0,onLog:false};power=0;ammo=0;bossNuts=0;sup=[];quake=[];jbuf=0;nuts=[];nutCD=0;camV=0;msg={s:'',l:0};safe={x:60,y:290};bossReset();dnH=false;
   {const cs=new Set(COL[LV]||[]);flies=FLY.map((a,i)=>({x:a[0],y:a[1],got:cs.has(i),i}))}
+  {const cs=new Set(POTB[LV]||[]);pots=(LVD[LV].POT||[]).map((a,i)=>({x:a[0],y:a[1],got:cs.has(i),i}))}
   foes=FOES.map(a=>({k:a[0],x:a[1],y:a[2],a:a[3],b:a[4],d:a[5],alive:true,dead:0}));
   hpick=HEARTS.map(a=>({x:a[0],y:a[1],got:false}));
 }
@@ -405,6 +417,9 @@ function update(){
     if(p.vy>0&&p.x+p.w>f.x-34&&p.x<f.x+34&&p.y+p.h>f.y-30&&p.y+p.h<f.y+10){p.vy=-21.5;p.ground=false;p.bounce=1;p.air=1;f.pop=14;burst(f.x,f.y-30,'#7ff3ff',16,4);sfx('boing')}}
   for(const f of flies){if(!f.got&&Math.hypot(f.x-(p.x+20),f.y+Math.sin(t/20+f.x)*6-(p.y+p.h*.45))<36){f.got=true;score++;(RUNCOL[LV]=RUNCOL[LV]||[]).push(f.i);sfx('coin');burst(f.x,f.y,'#ffe27a',14);
     power++;if(power>=NUT_NEED){power=0;ammo+=10;sfx('charged');burst(p.x+20,p.y+30,'#ffd23f',34,5);msg={s:'+10 NUTS!  '+(COARSE?'Tap the nut button':'Press X')+' to throw',l:150}}}}
+  for(const q of pots){if(!q.got&&Math.hypot(q.x-(p.x+20),q.y+Math.sin(t/22+q.x)*6-(p.y+p.h*.45))<42){q.got=true;(RUNPOT[LV]=RUNPOT[LV]||[]).push(q.i);sfx('potion');
+    burst(q.x,q.y,'#c98bff',26,4);burst(q.x,q.y,'#fff3cf',10,2);
+    const nd=nextNeed();msg={s:nd?'POTION FOUND!  '+potOwned()+'/'+nd+' to unlock the next hero':'POTION FOUND!  '+potOwned()+' collected',l:190}}}
   if(nutCD>0)nutCD--;if(msg.l>0)msg.l--;
   const th=!!Th();
   if(th){if(ammo+bossNuts>0){if(nutCD<=0&&takeNut()){p.th=18;nutCD=17}}
@@ -495,6 +510,17 @@ function drawPad(f){const x=f.x-camX,sq=f.pop?.75+(14-f.pop)*.018:1;g.save();g.t
   g.fillStyle='#e8d9b5';g.beginPath();g.roundRect(-8,-24,16,26,6);g.fill();g.strokeStyle='#4a3a22';g.lineWidth=2.5;g.stroke();
   let gr=g.createRadialGradient(-8,-44,4,0,-30,36);gr.addColorStop(0,'#9bf3ff');gr.addColorStop(.6,'#2fb5d9');gr.addColorStop(1,'#1b7aa8');g.fillStyle=gr;g.beginPath();g.ellipse(0,-30,34,20,0,Math.PI,0);g.lineTo(34,-28);g.quadraticCurveTo(0,-20,-34,-28);g.fill();g.strokeStyle='#0e4a6a';g.stroke();
   g.fillStyle='#e8ffff';[[-16,-38,5],[6,-45,4],[18,-34,4]].forEach(a=>{g.beginPath();g.arc(a[0],a[1],a[2],0,7);g.fill()});g.restore()}
+let POTIMG=null;
+function potSprite(){if(POTIMG)return POTIMG;const s=72,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.lineJoin='round';
+  x.fillStyle='#c89a63';x.strokeStyle='#4a2a10';x.lineWidth=3;x.beginPath();x.roundRect(s/2-7,6,14,13,3);x.fill();x.stroke();
+  const b=x.createLinearGradient(0,16,0,s-6);b.addColorStop(0,'#f6ecff');b.addColorStop(.42,'#d7a6ff');b.addColorStop(1,'#8b3fe0');
+  x.fillStyle=b;x.beginPath();x.moveTo(s/2-7,17);x.quadraticCurveTo(s/2-25,s*.52,s/2-17,s-14);x.quadraticCurveTo(s/2,s+4,s/2+17,s-14);x.quadraticCurveTo(s/2+25,s*.52,s/2+7,17);x.closePath();x.fill();x.stroke();
+  x.fillStyle='#ffffff99';x.beginPath();x.ellipse(s/2-9,s*.58,4,10,.22,0,7);x.fill();
+  x.fillStyle='#fff6a8';[[s/2+7,s*.46,3.4],[s/2-3,s*.78,2.4]].forEach(a=>{x.beginPath();for(let i=0;i<8;i++){const r=i%2?a[2]*.42:a[2],an=i*Math.PI/4-Math.PI/2;x[i?'lineTo':'moveTo'](a[0]+Math.cos(an)*r,a[1]+Math.sin(an)*r)}x.closePath();x.fill()});
+  return POTIMG=c}
+function drawPot(q){if(q.got)return;const x=q.x-camX,y=q.y+Math.sin(t/22+q.x)*6;if(x<-46||x>VW+46)return;
+  g.save();g.globalCompositeOperation='lighter';g.drawImage(glow('pot',88,88,44,44,2,44,'#b46bffaa'),x-44,y-44);g.restore();
+  const s=54*(1+Math.sin(t/10+q.x)*.045);g.drawImage(potSprite(),x-s/2,y-s/2,s,s)}
 function drawFly(f){if(f.got)return;const x=f.x-camX,y=f.y+Math.sin(t/20+f.x)*5;if(x<-30||x>VW+30)return;
   g.save();g.globalCompositeOperation='lighter';g.drawImage(glow('coin',52,52,26,26,2,26,'#ffe27a88'),x-26,y-26);g.restore();
   const sx=Math.max(.14,Math.abs(Math.cos(t/16+f.x*.05)));g.drawImage(IM.coin,x-15*sx,y-15,30*sx,30)}
@@ -545,6 +571,12 @@ function hud(){drawBossBar();
     panel(by,'#3a2410dd','#2b1808');g.textAlign='left';g.font='700 19px Fredoka,sans-serif';g.fillStyle='#fff3cf';g.fillText('NUTS ×'+ammo,bx+40,by+22);
     g.fillStyle='#00000066';g.beginPath();g.roundRect(bx+40,by+28,106,7,3.5);g.fill();if(f>0){g.fillStyle='#ffc933';g.beginPath();g.roundRect(bx+40,by+28,106*f,7,3.5);g.fill()}
     if(boss.on){const y2=by+46;panel(y2,'#0f3a24ee','#06241a');g.font='700 16px Fredoka,sans-serif';g.fillStyle='#b9ffd8';g.fillText('BOSS NUTS ×'+bossNuts,bx+40,y2+25)}}
+  {const n=potOwned(),rn=(RUNPOT[LV]||[]).length;g.save();g.font='700 20px Fredoka,"Trebuchet MS",sans-serif';g.textAlign='left';
+    const s1='×'+n,wd=44+g.measureText(s1).width+(rn?g.measureText('+'+rn).width+8:0)+12,bx=Math.round(W/2-wd/2);
+    g.fillStyle='#2a1240dd';g.beginPath();g.roundRect(bx,H-52,wd,36,18);g.fill();g.lineWidth=3;g.strokeStyle='#0d0518';g.stroke();
+    g.drawImage(potSprite(),bx-4,H-60,44,44);
+    g.fillStyle='#e8ccff';g.fillText(s1,bx+36,H-26);
+    if(rn){const w=g.measureText(s1).width;g.fillStyle='#ffd23f';g.fillText('+'+rn,bx+40+w,H-26)}g.restore()}
   if(msg.l>0){g.save();g.globalAlpha=Math.min(1,msg.l/25);g.textAlign='center';g.font='700 26px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=6;g.strokeStyle='#3a2410';g.lineJoin='round';g.strokeText(msg.s,W/2,H*.2);g.fillStyle='#ffd23f';g.fillText(msg.s,W/2,H*.2);g.restore()}
 }
 function banner(a,lines){
@@ -577,7 +609,7 @@ function drawBossBar(){const b=boss;if(!b.on)return;const im=IM.bar,w=340,h=w*im
 function draw(){
   g.setTransform(K,0,0,K,0,0);g.clearRect(0,0,W,H);
   const menu=isMenu();drawBG();
-  if(!menu){g.save();g.translate(shake>0?(Math.random()-.5)*shake*.5:0,TY+camV+(shake>0?(Math.random()-.5)*shake*.5:0));g.scale(Z,Z);drawPlats();if(LV===1)drawTunnel();BR.forEach(drawBranch);pads.forEach(drawPad);HAZ.forEach(drawHaz);flies.forEach(drawFly);hpick.forEach(drawHP);foes.forEach(drawFoe);drawBoss();waves.forEach(drawWave);sup.forEach(drawSup);quake.forEach(drawQuake);nuts.forEach(drawNut);drawHero();
+  if(!menu){g.save();g.translate(shake>0?(Math.random()-.5)*shake*.5:0,TY+camV+(shake>0?(Math.random()-.5)*shake*.5:0));g.scale(Z,Z);drawPlats();if(LV===1)drawTunnel();BR.forEach(drawBranch);pads.forEach(drawPad);HAZ.forEach(drawHaz);flies.forEach(drawFly);pots.forEach(drawPot);hpick.forEach(drawHP);foes.forEach(drawFoe);drawBoss();waves.forEach(drawWave);sup.forEach(drawSup);quake.forEach(drawQuake);nuts.forEach(drawNut);drawHero();
   ps.forEach(a=>{g.globalAlpha=Math.min(1,a.l/20);g.fillStyle=a.c;g.beginPath();g.arc(a.x-camX,a.y,a.r,0,7);g.fill()});g.globalAlpha=1;g.restore()}
   const v=g.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*1.0);v.addColorStop(0,'#0000');v.addColorStop(1,'#04140c66');g.fillStyle=v;g.fillRect(0,0,W,H);
   if(!menu)hud();
@@ -585,8 +617,8 @@ function draw(){
     const ta=k<45?0:k<140?Math.min(1,(k-45)/20):Math.max(0,1-(k-140)/18);
     if(ta>0){g.save();g.globalAlpha=ta;g.textAlign='center';g.lineJoin='round';g.font='700 84px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=12;g.strokeStyle='#3a2410';g.strokeText('LEVEL 2',W/2,H/2);g.fillStyle='#ffd23f';g.fillText('LEVEL 2',W/2,H/2);g.font='500 26px Fredoka,sans-serif';g.fillStyle='#fff3cf';g.fillText('The Twilight Canopy',W/2,H/2+46);g.restore()}}
   if(state==='pause')banner('Paused',['Tap the play button or press P to continue']);
-  if(state==='over')banner('Oh nuts!',['Coins from this try were not kept - finish the level to bank them','Press Space or tap to try again']);
-  if(state==='win')banner('Toad King defeated!',['Level 2 cleared!  +'+score+' coins banked (total '+wallet+')','Press Space or tap to play again']);
+  if(state==='over')banner('Oh nuts!',['Coins and potions from this try were not kept - finish the level to bank them','Press Space or tap to try again']);
+  if(state==='win')banner('Toad King defeated!',['Level 2 cleared!  +'+score+' coins banked (total '+wallet+')','Potions found: '+potOwned()+'  -  '+ (nextNeed()? nextNeed()+' unlocks the next hero' : 'every hero unlocked!'),'Press Space or tap to play again']);
 }
 let last=performance.now(),acc=0;
 function loop(n){if(state==='play'&&PORTRAIT.matches)state='pause';acc+=Math.min(100,n-last);last=n;while(acc>=16.67){if(state==='play')update();else{t++;if(state==='trans')transUpdate()}acc-=16.67}if(isMenu())camX=(L-VW)*(.5+.5*Math.sin(t/420));syncUI();syncPad();if(AU.ctx&&AU.ctx.state==='running')setTrack(isMenu()?'menu':'game');draw();requestAnimationFrame(loop)}
@@ -595,28 +627,47 @@ let wallet=0;try{wallet=+localStorage.getItem('gw_coins')||0}catch(e){}
 const $=id=>document.getElementById(id);
 let lastUI='';
 const isMenu=()=>state==='title'||state==='select'||state==='store';
-function setWal(){['wal','twal'+'N','swal'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=wallet})}
+function setWal(){['wal','twal'+'N','swal'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=wallet});
+  try{const p=''+potOwned();['pwalN','spwalN','tpwalN'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=p})}catch(e){}}
 let lastP=-1;
 function syncPad(){const tn=ammo+bossNuts,k=tn*100+power;if(k===lastP)return;lastP=k;const b=$('bp');b.style.setProperty('--p',power/NUT_NEED);b.classList.toggle('full',tn>0);$('bpc').textContent=tn}
 function syncUI(){const pb=$('pause');pb.style.display=(state==='play'||state==='pause')?'grid':'none';$('home').style.display=(state==='play'||state==='pause'||state==='over'||state==='win')?'grid':'none';pb.classList.toggle('paused',state==='pause');if(state===lastUI)return;lastUI=state;const m=isMenu();$('wrap').classList.toggle('menu',m);$('ui').classList.toggle('off',!m);$('title').classList.toggle('hide',state!=='title');$('select').classList.toggle('hide',state!=='select');$('store').classList.toggle('hide',state!=='store');if(m)setWal()}
-function showSelect(){if(state!=='title')return;if(!AUTH.user){AUTH.next=null;sfx('click');openAuth();return}state='select';sfx('click');if(SELLV>MAXLV)SELLV=1;drawLvs()}
-function startRun(){if(state!=='select')return;sfx('click');RUNCOL={1:[],2:[]};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
-function toTitle(){state='title';tr.on=false;RUNCOL={1:[],2:[]}}
+function showSelect(){if(state!=='title')return;if(!AUTH.user){AUTH.next=null;sfx('click');openAuth();return}state='select';sfx('click');if(SELLV>MAXLV)SELLV=1;if(!heroUnlocked(HEROES[HERO]))HERO=0;drawSlots();drawLvs();setWal()}
+function startRun(){if(state!=='select')return;sfx('click');RUNCOL={1:[],2:[]};RUNPOT={1:[],2:[]};LV=SELLV;reset();state='play';
+  {const left=flies.filter(f=>!f.got).length,pl=pots.filter(q=>!q.got).length;
+   if(pl< pots.length)msg={s:left+' coins and '+pl+' potion'+(pl===1?'':'s')+' left to find here',l:180}
+   else if(left<flies.length)msg={s:left+' coins left to find here',l:170}
+   else if(pots.length)msg={s:pots.length+' hidden potions in this level - grab them!',l:170}}}
+function toTitle(){state='title';tr.on=false;RUNCOL={1:[],2:[]};RUNPOT={1:[],2:[]}}
 function bankLevel(how){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(how,score)}
-function endRun(s){if(state!=='play')return;state=s;if(s==='win')bankLevel('win');else{RUNCOL={1:[],2:[]};cloudSave(s,0)}}
+function endRun(s){if(state!=='play')return;state=s;if(s==='win')bankLevel('win');else{RUNCOL={1:[],2:[]};RUNPOT={1:[],2:[]};cloudSave(s,0)}}
 const LOCK='<svg viewBox="0 0 64 64"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#dfe6ee" stroke-width="6" stroke-linecap="round"/><rect x="12" y="28" width="40" height="28" rx="8" fill="#e9b949" stroke="#7a4a0a" stroke-width="3"/><circle cx="32" cy="41" r="4" fill="#7a4a0a"/></svg>';
-const HEROES=[{n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]]},0,0,0];
-function showHero(i){const h=HEROES[i];$('pName').textContent=h.n;$('pRole').textContent=h.role;$('bars').innerHTML=h.st.map(a=>`<div class="bar"><span>${a[0]}</span><i><b style="width:${a[1]*100}%"></b></i></div>`).join('');document.querySelectorAll('.tile').forEach((t,k)=>t.classList.toggle('on',k===i))}
+// pot: how many POTIONS you must collect to unlock this hero. 0 = unlocked from the start.
+const HEROES=[{id:'oakie',n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]],pot:0},
+ {id:'pip',n:'Pip',role:'The Quick Squirrel',st:[['Speed',.9],['Jump',.55],['Luck',.72]],pot:3,art:0},
+ {id:'bramble',n:'Bramble',role:'The Tiny Hedgehog',st:[['Speed',.5],['Jump',.7],['Luck',.95]],pot:6,art:0},
+ {id:'fern',n:'Fern',role:'The Leaf Dancer',st:[['Speed',.75],['Jump',.95],['Luck',.6]],pot:9,art:0}];
+let HERO=0;
+function drawSlots(){
+  const po=potOwned();
+  $('slots').innerHTML=HEROES.map(h=>{const un=heroUnlocked(h);
+    if(un)return '<div class="tile"><img class="face" src="'+A.idle+'" alt="">'+(h.art===0?'<span class="beta">SOON</span>':'')+'</div>';
+    return '<div class="tile lockd">'+LOCK+'<b class="pk">'+Math.min(po,h.pot)+'/'+h.pot+'</b></div>'}).join('');
+  document.querySelectorAll('#slots .tile').forEach((c,i)=>c.onclick=()=>{const h=HEROES[i];
+    if(heroUnlocked(h)){HERO=i;sfx('click');
+      $('note').textContent=(h.art===0?h.n+' is unlocked! His own sprites are next on the list - he borrows Oakie\u2019s for now.':h.role);drawSlots();applySkin()}
+    else{sfx('nope');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');
+      $('note').textContent='Find '+h.pot+' potions in the levels to unlock '+h.n+'  ('+potOwned()+'/'+h.pot+' found)'}});
+  showHero(HERO)}
+function showHero(i){const h=HEROES[i];if(!h)return;$('pName').textContent=h.n;$('pRole').textContent=h.role;$('bars').innerHTML=h.st.map(a=>`<div class="bar"><span>${a[0]}</span><i><b style="width:${a[1]*100}%"></b></i></div>`).join('');document.querySelectorAll('#slots .tile').forEach((t,k)=>t.classList.toggle('on',k===i))}
 function buildUI(){
   $('lg1').textContent=GAME_NAME[0];$('lg2').textContent=GAME_NAME[1];
   $('gnd').style.backgroundImage='url('+A.tile+')';document.querySelectorAll('.coin').forEach(c=>{c.style.background='url('+A.coin+') center/contain no-repeat';c.style.border='0';c.style.boxShadow='none';c.style.width='1.05em';c.style.height='1.05em'});
   $('h1').src=A.runAb;$('h2').src=A.runBb;$('sHero').src=A.idleBig;
   let f=0;setInterval(()=>{f^=1;$('h1').style.opacity=f?0:1;$('h2').style.opacity=f?1:0},150);
-  $('slots').innerHTML=HEROES.map(h=>h?`<div class="tile on"><img class="face" src="${A.idle}" alt=""></div>`:`<div class="tile lockd">${LOCK}</div>`).join('');
-  showHero(0);
-  document.querySelectorAll('.tile').forEach((c,i)=>c.addEventListener('click',()=>{if(HEROES[i]){showHero(i);$('note').textContent='More heroes are on the way';sfx('click')}else{sfx('nope');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');$('note').textContent='Locked. Heroes will unlock with coins soon.'}}));
+  drawSlots();
   $('play').onclick=showSelect;$('start').onclick=startRun;$('back').onclick=()=>{state='title';sfx('click')};
-  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){RUNCOL={1:[],2:[]};cloudSave('quit',0)}toTitle();sfx('click')});
+  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){RUNCOL={1:[],2:[]};RUNPOT={1:[],2:[]};cloudSave('quit',0)}toTitle();sfx('click')});
   $('pause').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play')state='pause';else if(state==='pause')state='play'});
   if(COARSE)$('hint').textContent='Tap PLAY - the game goes fullscreen (landscape)';
   $('snd').onclick=()=>{AU.on=!AU.on;if(AU.master)AU.master.gain.value=AU.on?1:0;$('snd').textContent=AU.on?'🔊':'🔇';auStart()};
@@ -635,7 +686,8 @@ const STORE_ITEMS={oakie:{
  cap:[{id:'cap0',n:'Classic Cap',p:0,t:null,d:'Your trusty acorn cap'},{id:'cap1',n:'Forest Cap',p:25,t:[90,1,1.05],d:'Fresh from the canopy'},{id:'cap2',n:'Berry Cap',p:25,t:[-32,1.2,1.2],d:'Sweet and sharp'},{id:'cap3',n:'Ocean Cap',p:40,t:[185,1.2,1.3],d:'Cool as the river'},{id:'cap4',n:'Bubblegum',p:60,t:[310,.85,1.45],d:'Pop! Very pink'},{id:'cap5',n:'Royal Cap',p:80,t:[250,1.1,1.25],d:'Fit for a forest prince'},{id:'cap6',n:'Midnight Cap',p:120,t:[0,.25,.5],d:'Sneaky night shade'},{id:'cap7',n:'Golden Cap',p:250,t:[22,1.5,1.75],d:'Pure shiny gold'}],
  out:[{id:'out0',n:'Classic Scarf',p:0,t:null,d:'Leaf cape and green scarf'},{id:'out1',n:'Scarlet',p:30,t:[-62,1.25,2],d:'A hero\'s red cape'},{id:'out2',n:'Ocean Blue',p:30,t:[158,1.3,1.9],d:'Splash of the waterfall'},{id:'out3',n:'Rose',p:50,t:[-92,.9,2.1],d:'Soft and stylish'},{id:'out4',n:'Royal Purple',p:80,t:[218,1.1,1.8],d:'Cape of kings'},{id:'out5',n:'Snow',p:100,t:[0,.12,2.3],d:'Winter white'},{id:'out6',n:'Midnight',p:150,t:[0,.5,.5],d:'Shadow ninja style'},{id:'out7',n:'Golden',p:250,t:[-14,1.4,2.3],d:'Legendary gold'}],
  sh:[{id:'sh0',n:'Classic Red',p:0,t:null,d:'Fast red sneakers'},{id:'sh1',n:'Ocean Blue',p:20,t:[215,1,1],d:'Cool blue kicks'},{id:'sh2',n:'Forest Green',p:20,t:[125,1,.95],d:'Moss runners'},{id:'sh3',n:'Pink Pop',p:40,t:[-25,.55,1.25],d:'Bounce in style'},{id:'sh4',n:'Snow White',p:50,t:[0,.08,1.45],d:'Clean and crisp'},{id:'sh5',n:'Royal Purple',p:70,t:[275,1,.95],d:'Royal runners'},{id:'sh6',n:'Shadow Black',p:90,t:[0,.15,.35],d:'Stealth sneakers'},{id:'sh7',n:'Golden Kicks',p:200,t:[48,1,1.15],d:'Run like a champion'}]}};
-const STORE_CHARS=[{id:'oakie',n:'Oakie'}];
+const STORE_CHARS=HEROES.map(h=>({id:h.id,n:h.n}));
+['pip','bramble','fern'].forEach(id=>{STORE_ITEMS[id]=JSON.parse(JSON.stringify(STORE_ITEMS.oakie))});
 const SKIN_KEYS=['idle','runA','runB','jump','hurt','windup','throw','follow','slide','idleBig','runAb','runBb'];
 const CAP_CUT={},CAP_XMAX={throw:.75};
 const ssm=(a,b,x)=>{x=(x-a)/(b-a);x=x<0?0:x>1?1:x;return x*x*(3-2*x)};
@@ -663,7 +715,7 @@ function recolor(img,key,tCap,tOut,tSh,scale){
       d[p]=d[p]*(1-wt)+o[0]*wt;d[p+1]=d[p+1]*(1-wt)+o[1]*wt;d[p+2]=d[p+2]*(1-wt)+o[2]*wt}}
   x.putImageData(id,0,0);return c}
 // ---- inventory (per hero) ----
-const defInv=()=>({oakie:{own:['cap0','out0','sh0'],eq:{cap:'cap0',out:'out0',sh:'sh0'}}});
+const defInv=()=>{const o={};STORE_CHARS.forEach(c=>{o[c.id]={own:['cap0','out0','sh0'],eq:{cap:'cap0',out:'out0',sh:'sh0'}}});return o};
 let INV=defInv();
 function normInv(v){const o=defInv();try{for(const ch of STORE_CHARS){const s=v&&v[ch.id];if(!s)continue;const all=[].concat(...CATS.map(c=>STORE_ITEMS[ch.id][c.id].map(i=>i.id)));
   const own=new Set(o[ch.id].own);(s.own||[]).forEach(i=>{if(all.includes(i))own.add(i)});o[ch.id].own=[...own];
@@ -672,9 +724,10 @@ try{INV=normInv(JSON.parse(LS.g('gw_inv')||'null'))}catch(e){}
 const itemOf=(ch,cat,id)=>STORE_ITEMS[ch][cat].find(i=>i.id===id);
 const curT=(ch,cat,ov)=>{const id=(ov&&ov[cat])||INV[ch].eq[cat],it=itemOf(ch,cat,id);return it?it.t:null};
 let IM0=null;
+const heroId=()=>(HEROES[HERO]||HEROES[0]).id;
 function applySkin(){
   if(!IM0){IM0={};SKIN_KEYS.forEach(k=>IM0[k]=IM[k])}
-  const T=['cap','out','sh'].map(c=>curT('oakie',c));
+  const T=['cap','out','sh'].map(c=>curT(heroId(),c));
   SKIN_KEYS.forEach(k=>{const c=recolor(IM0[k],k,T[0],T[1],T[2]);IM[k]=T[0]||T[1]||T[2]?c:IM0[k]});
   try{ // menu <img> sprites
     const u=k=>(IM[k]===IM0[k]?A[k]:IM[k].toDataURL('image/png'));
@@ -684,23 +737,29 @@ function applySkin(){
 function saveInv(){LS.s('gw_inv',JSON.stringify(INV));LS.s('gw_coins',wallet);
   if(DB&&CSYNC){try{DB.collection('users').doc(CSYNC).set({coins:wallet,inv:INV,lastPlayed:FV().serverTimestamp()},{merge:true}).catch(()=>{})}catch(e){}}}
 // ---- store screen ----
-let SS={cat:'cap',sel:null,prev:{}};const THUMB={};
+let SS={ch:'oakie',cat:'cap',sel:null,prev:{}};const THUMB={};
 const CROP={cap:[100,0,300,176],out:[90,190,310,150],sh:[150,372,260,68]};
 function thumb(cat,it){const k=it.id;if(THUMB[k])return THUMB[k];
   const big=recolor(IM0.idleBig,'idleBig',cat==='cap'?it.t:null,cat==='out'?it.t:null,cat==='sh'?it.t:null,.5),cr=CROP[cat].map(v=>Math.round(v/2)),c=document.createElement('canvas');c.width=cr[2];c.height=cr[3];
   c.getContext('2d').drawImage(big,cr[0],cr[1],cr[2],cr[3],0,0,cr[2],cr[3]);return THUMB[k]=c}
 function showStore(){if(state!=='title')return;if(!AUTH.user){AUTH.next='store';sfx('click');openAuth();return}
-  state='store';sfx('click');if(!IM0)applySkin();SS.cat='cap';SS.prev={};SS.sel=INV.oakie.eq.cap;drawStore();toast('')}
+  state='store';sfx('click');if(!IM0)applySkin();SS.ch=heroId();SS.cat='cap';SS.prev={};SS.sel=INV[SS.ch].eq.cap;drawStore();toast('')}
 function closeStore(){SS.prev={};state='title';sfx('click')}
 let toastT=0;function toast(m){const e=$('toast');if(!e)return;e.textContent=m;e.classList.toggle('on',!!m);clearTimeout(toastT);if(m)toastT=setTimeout(()=>e.classList.remove('on'),2400)}
 function drawStage(){const c=$('stCv'),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
-  const T=['cap','out','sh'].map(k=>curT('oakie',k,SS.prev));x.drawImage(recolor(IM0.idleBig,'idleBig',T[0],T[1],T[2]),0,0)}
+  const ch=SS.ch||'oakie',T=['cap','out','sh'].map(k=>curT(ch,k,SS.prev));x.drawImage(recolor(IM0.idleBig,'idleBig',T[0],T[1],T[2]),0,0)}
 function drawStore(){
-  const ch='oakie',items=STORE_ITEMS[ch][SS.cat],own=new Set(INV[ch].own);
+  const ch=SS.ch||'oakie',items=STORE_ITEMS[ch][SS.cat],own=new Set(INV[ch].own),po=potOwned();
   $('ctabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===SS.cat));
-  $('schars').innerHTML='<div class="tile on"><img class="face" alt=""></div><div class="tile lockd">'+LOCK+'</div><div class="tile lockd">'+LOCK+'</div><div class="nm">Oakie</div>';
-  try{$('schars').querySelector('.face').src=IM.idle.toDataURL?IM.idle.toDataURL():A.idle}catch(e){}
-  $('schars').querySelectorAll('.lockd').forEach(el=>el.onclick=()=>{sfx('nope');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');toast('Heroes unlock by finding potions in levels - coming soon')});
+  $('schars').innerHTML=HEROES.map(h=>{const un=heroUnlocked(h);
+    return un?'<div class="tile'+(h.id===ch?' on':'')+'" data-c="'+h.id+'"><img class="face" alt=""></div>'
+             :'<div class="tile lockd" data-c="'+h.id+'">'+LOCK+'<b class="pk">'+Math.min(po,h.pot)+'/'+h.pot+'</b></div>'}).join('')
+    +'<div class="nm">'+((HEROES.find(h=>h.id===ch)||HEROES[0]).n)+'</div>';
+  try{$('schars').querySelectorAll('.face').forEach(e=>e.src=IM.idle.toDataURL?IM.idle.toDataURL():A.idle)}catch(e){}
+  $('schars').querySelectorAll('[data-c]').forEach(el=>el.onclick=()=>{const h=HEROES.find(x=>x.id===el.dataset.c);
+    if(!heroUnlocked(h)){sfx('nope');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');
+      toast('Find '+h.pot+' potions in the levels to unlock '+h.n+'  ('+potOwned()+'/'+h.pot+')');return}
+    sfx('click');SS.ch=h.id;SS.cat='cap';SS.sel=INV[h.id].eq.cap;SS.prev={};drawStore()});
   const g=$('igrid');g.innerHTML='';
   items.forEach(it=>{const o=own.has(it.id),eq=INV[ch].eq[SS.cat]===it.id,el=document.createElement('div');
     el.className='ic'+(SS.sel===it.id?' sel':'')+(eq?' eq':'')+(o?' own':'')+(!o&&it.p>wallet?' cant':'');
@@ -719,24 +778,37 @@ function drawStore(){
   else{b.textContent='Need '+(it.p-wallet)+' more';b.className='btn dis';$('sDesc').textContent=it.d+'  -  collect coins to afford it'}
   setWal();drawStage()}
 function cloneCanvas(c){const n=document.createElement('canvas');n.width=c.width;n.height=c.height;n.getContext('2d').drawImage(c,0,0);return n}
-function storeAct(){const ch='oakie',it=itemOf(ch,SS.cat,SS.sel);if(!it)return;const own=INV[ch].own.includes(it.id);
+function storeAct(){const ch=SS.ch||'oakie',it=itemOf(ch,SS.cat,SS.sel);if(!it)return;const own=INV[ch].own.includes(it.id);
   if(own){if(INV[ch].eq[SS.cat]!==it.id){INV[ch].eq[SS.cat]=it.id;applySkin();saveInv();sfx('click');toast(it.n+' equipped!')}}
   else if(wallet>=it.p){wallet-=it.p;INV[ch].own.push(it.id);INV[ch].eq[SS.cat]=it.id;applySkin();saveInv();sfx('charged');toast('Bought '+it.n+'!  -'+it.p+' coins')}
   else{sfx('nope');const b=$('sAct');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');toast('Not enough coins. Finish levels to bank more!')}
   drawStore()}
 function initStore(){$('storeBtn').onclick=showStore;$('sBack').onclick=closeStore;$('sAct').onclick=storeAct;
-  $('ctabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{SS.cat=b.dataset.c;SS.sel=INV.oakie.eq[SS.cat];SS.prev={};sfx('click');drawStore()})}
+  $('ctabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{SS.cat=b.dataset.c;SS.sel=INV[SS.ch||'oakie'].eq[SS.cat];SS.prev={};sfx('click');drawStore()})}
 
 let FB=null,DB=null,CSYNC=null,BEST=0,MAXLV=1;
 let COL={1:[],2:[]},RUNCOL={1:[],2:[]},SELLV=1;
+let POTB={1:[],2:[]},RUNPOT={1:[],2:[]},JUSTUNLOCK=null;
 function normCol(c){const o={1:[],2:[]};if(c)for(const k of [1,2])if(Array.isArray(c[k]))o[k]=c[k].map(Number).filter(Number.isFinite);return o}
 try{COL=normCol(JSON.parse(LS.g('gw_col')||'null'));MAXLV=+LS.g('gw_maxlv')||1}catch(e){}
+try{POTB=normCol(JSON.parse(LS.g('gw_pot')||'null'))}catch(e){}
+function potOwned(){let n=0;for(const k in POTB)n+=(POTB[k]||[]).length;for(const k in RUNPOT)n+=(RUNPOT[k]||[]).length;return n}
+function heroUnlocked(h){return !!h&&(!h.pot||potOwned()>=h.pot)}
+function nextNeed(){let m=0;HEROES.forEach(h=>{if(h&&h.pot&&h.pot>potOwned()&&(!m||h.pot<m))m=h.pot});return m}
 function bankRun(){for(const n of [1,2]){const a=RUNCOL[n];if(a&&a.length){const st=new Set(COL[n]||[]);a.forEach(i=>st.add(i));COL[n]=[...st].sort((x,y)=>x-y)}RUNCOL[n]=[]}
-  if(LV>MAXLV)MAXLV=LV;LS.s('gw_col',JSON.stringify(COL));LS.s('gw_maxlv',MAXLV)}
+  let gained=0;for(const n of [1,2]){const a=RUNPOT[n];if(a&&a.length){const st=new Set(POTB[n]||[]);a.forEach(i=>{if(!st.has(i)){st.add(i);gained++}});POTB[n]=[...st].sort((x,y)=>x-y)}RUNPOT[n]=[]}
+  if(LV>MAXLV)MAXLV=LV;LS.s('gw_col',JSON.stringify(COL));LS.s('gw_maxlv',MAXLV);LS.s('gw_pot',JSON.stringify(POTB));
+  if(gained){const before=potOwned()-gained,now=potOwned();JUSTUNLOCK=null;
+    HEROES.forEach(h=>{if(h&&h.pot&&before<h.pot&&now>=h.pot)JUSTUNLOCK=JUSTUNLOCK||h.n});
+    return gained}
+  return 0}
 function drawLvs(){const box=$('lvs');if(!box)return;
   box.innerHTML=[1,2].map(n=>{const tot=LVD[n].FLY.length,left=Math.max(0,tot-(COL[n]||[]).length),lk=n>MAXLV;
-    return '<div class="lv'+(n===SELLV?' on':'')+(lk?' lk':'')+'" data-n="'+n+'">Level '+n+'<small>'+(lk?'&#128274; Beat level '+(n-1):(left>0?left+' coins left':'All coins found'))+'</small></div>'}).join('');
-  box.querySelectorAll('.lv').forEach(el=>el.onclick=()=>{const n=+el.dataset.n;if(n>MAXLV){sfx('nope');$('note').textContent='Beat Level '+(n-1)+' to unlock this.';return}SELLV=n;sfx('click');$('note').textContent='';drawLvs()})}
+    const pt=(LVD[n].POT||[]).length,pg=Math.min(pt,(POTB[n]||[]).length);
+    const sub=lk?'&#128274; Beat level '+(n-1):(left>0?left+' coins left':'All coins found')+(pt?' &middot; <i class="pico"></i>'+pg+'/'+pt:'');
+    return '<div class="lv'+(n===SELLV?' on':'')+(lk?' lk':'')+'" data-n="'+n+'">Level '+n+'<small>'+sub+'</small></div>'}).join('');
+  box.querySelectorAll('.lv').forEach(el=>el.onclick=()=>{const n=+el.dataset.n;if(n>MAXLV){sfx('nope');$('note').textContent='Beat Level '+(n-1)+' to unlock this.';return}SELLV=n;sfx('click');$('note').textContent='';drawLvs()});
+  if(JUSTUNLOCK){$('note').textContent='&#127881; '+JUSTUNLOCK+' unlocked! Pick a hero above.';JUSTUNLOCK=null}}
 function unlockSave(){MAXLV=Math.max(MAXLV,2);LS.s('gw_maxlv',MAXLV);if(DB&&CSYNC){try{DB.collection('users').doc(CSYNC).set({maxLevel:MAXLV},{merge:true}).catch(()=>{})}catch(e){}}}
 const FV=()=>FB.firestore.FieldValue;
 async function cloudLogin(){
@@ -745,17 +817,17 @@ async function cloudLogin(){
   const ref=DB.collection('users').doc(u.uid);
   try{
     const sn=await ref.get();
-    if(sn.exists){const d=sn.data();wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;COL=normCol(d.collected);INV=normInv(d.inv);LS.s('gw_inv',JSON.stringify(INV));
+    if(sn.exists){const d=sn.data();wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;COL=normCol(d.collected);POTB=normCol(d.potions);INV=normInv(d.inv);LS.s('gw_inv',JSON.stringify(INV));
       await ref.set({name:AUTH.user.name,email:u.email,lastLogin:FV().serverTimestamp(),loginCount:FV().increment(1)},{merge:true})}
-    else{wallet=0;BEST=0;MAXLV=1;COL={1:[],2:[]};INV=defInv();
-      await ref.set({name:AUTH.user.name,email:u.email,createdAt:FV().serverTimestamp(),lastLogin:FV().serverTimestamp(),loginCount:1,coins:0,bestScore:0,runs:0,wins:0,maxLevel:1,hero:0,collected:{1:[],2:[]},inv:INV})}
-    LS.s('gw_coins',wallet);LS.s('gw_col',JSON.stringify(COL));LS.s('gw_maxlv',MAXLV);RUNCOL={1:[],2:[]};if(SELLV>MAXLV)SELLV=1;try{setWal()}catch(e){}drawLvs();applySkin();
+    else{wallet=0;BEST=0;MAXLV=1;COL={1:[],2:[]};POTB={1:[],2:[]};INV=defInv();
+      await ref.set({name:AUTH.user.name,email:u.email,createdAt:FV().serverTimestamp(),lastLogin:FV().serverTimestamp(),loginCount:1,coins:0,bestScore:0,runs:0,wins:0,maxLevel:1,hero:0,collected:{1:[],2:[]},potions:{1:[],2:[]},inv:INV})}
+    LS.s('gw_coins',wallet);LS.s('gw_col',JSON.stringify(COL));LS.s('gw_pot',JSON.stringify(POTB));LS.s('gw_maxlv',MAXLV);RUNCOL={1:[],2:[]};RUNPOT={1:[],2:[]};if(SELLV>MAXLV)SELLV=1;if(!heroUnlocked(HEROES[HERO]))HERO=0;try{setWal()}catch(e){}drawLvs();applySkin();
   }catch(e){CSYNC=null}
 }
 function cloudSave(how,sc){
   if(!DB||!CSYNC)return;
   try{
-    const d={coins:wallet,lastPlayed:FV().serverTimestamp(),runs:FV().increment(how==='level'?0:1)};
+    const d={coins:wallet,potions:POTB,lastPlayed:FV().serverTimestamp(),runs:FV().increment(how==='level'?0:1)};
     if(sc>BEST){BEST=sc;d.bestScore=BEST}
     d.maxLevel=MAXLV;d.collected=COL;
     if(how==='win')d.wins=FV().increment(1);
@@ -771,7 +843,7 @@ const BE={
   async out(){if(FB)try{await FB.auth().signOut()}catch(e){}}
 };
 const ERR={'auth/email-already-in-use':'That email already has an account. Please sign in.','auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs at least 6 characters.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No internet connection.','local/noreset':'Reset emails need the online setup. Not switched on yet.'};
-function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');LS.d('gw_col');LS.d('gw_maxlv');LS.d('gw_inv');INV=defInv();try{applySkin()}catch(e){}wallet=0;BEST=0;MAXLV=1;COL={1:[],2:[]};RUNCOL={1:[],2:[]};SELLV=1;CSYNC=null}drawWho()}
+function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');LS.d('gw_col');LS.d('gw_pot');LS.d('gw_maxlv');LS.d('gw_inv');INV=defInv();try{applySkin()}catch(e){}wallet=0;BEST=0;MAXLV=1;COL={1:[],2:[]};RUNCOL={1:[],2:[]};POTB={1:[],2:[]};RUNPOT={1:[],2:[]};SELLV=1;CSYNC=null;HERO=0}drawWho()}
 function drawWho(){const w=$('who');if(!w)return;const show=AUTH.user&&(state==='title'||state==='select');w.style.display=show?'block':'none';if(show)w.innerHTML='&#128100; '+AUTH.user.name.replace(/[<>&]/g,'')+'<small>logged in</small>'}
 function aMsg(t,ok){const m=$('aMsg');m.textContent=t||'';m.className=ok?'ok':''}
 function aShake(){const c=$('acard');c.classList.remove('shk');void c.offsetWidth;c.classList.add('shk');sfx('nope')}
@@ -836,6 +908,7 @@ function sfx(n){const C=AU.ctx;if(!C||!AU.on||C.state!=='running')return;const t
   else if(n==='flap'){tone(520,t0,.16,'square',.08,d,{to:1100});tone(780,t0+.05,.12,'triangle',.08,d,{to:1500})}
   else if(n==='throw'){tone(560,t0,.12,'triangle',.12,d,{to:240});noiseHit(t0,.09,.08,d,'bandpass',2600)}
   else if(n==='charged')[659,880,1175,1568,2093].forEach((f,i)=>tone(f,t0+i*.06,.2,'triangle',.16,d));
+  else if(n==='potion'){[784,1047,1319,1568,2093].forEach((f,i)=>tone(f,t0+i*.05,.26,'triangle',.13,d));tone(2093,t0+.3,.5,'sine',.1,d,{to:3136})}
   else if(n==='slide')noiseHit(t0,.28,.14,d,'bandpass',1400);
   else if(n==='click')tone(660,t0,.07,'square',.09,d);
   else if(n==='nope')tone(200,t0,.18,'square',.08,d,{to:120})}
