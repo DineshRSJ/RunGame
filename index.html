@@ -118,8 +118,14 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .tile.lockd{background:rgba(0,0,0,.28)}
 .tile.shake{animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-.6em)}75%{transform:translateX(.6em)}}
+.lvs{display:flex;gap:1.2em;margin-top:1.6em}
+.lv{flex:1;padding:.5em .4em .6em;border-radius:1.1em;border:.12em solid #ffffff30;background:rgba(255,255,255,.06);color:#fff;font:600 1.9em Fredoka,sans-serif;text-align:center;cursor:pointer;line-height:1.15}
+.lv small{display:block;font:500 .62em Fredoka,sans-serif;color:#9fd3b8;margin-top:.15em}
+.lv.on{border-color:#ffd23f;box-shadow:0 0 1.2em #ffd23f55;background:rgba(255,210,63,.12)}
+.lv.lk{opacity:.55}
 .note{font:500 1.5em Fredoka,sans-serif;color:#9fd3b8;margin-top:1.2em;min-height:1.3em}
 .row{position:absolute;bottom:3em;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:2em}
+#select .row{right:auto;width:48%;bottom:2.6em}
 #snd{position:absolute;left:50%;bottom:2%;transform:translateX(-50%);width:clamp(32px,5%,50px);aspect-ratio:1;border-radius:50%;border:3px solid #fff9;background:#1f5a3acc;color:#fff;font-size:clamp(14px,2.4vw,24px);cursor:pointer;z-index:5;padding:0}
 #wrap.pt{width:min(100vw,calc((100vh - 8px)*9/16));width:min(100vw,calc((100dvh - 8px)*9/16));aspect-ratio:9/16}
 .pt .logo{top:3em}
@@ -183,6 +189,7 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
       <div class="pname" id="pName"></div><div class="prole" id="pRole"></div>
       <div class="bars" id="bars"></div>
       <div class="slots" id="slots"></div>
+      <div class="lvs" id="lvs"></div>
       <div class="note" id="note">More heroes are on the way</div>
     </div>
     <div class="row"><button class="btn ghost" id="back">Back</button><button class="btn" id="start">Start</button></div>
@@ -261,12 +268,12 @@ function buildL2(){
 function applyLevel(n){LV=n;const d=LVD[n];plats=d.plats;pads=d.pads;FLY=d.FLY;FOES=d.FOES;HEARTS=d.HEARTS;HAZ=d.HAZ;BR=d.BR}
 function startTrans(){if(state!=='play')return;state='trans';tr={on:true,t:0};sfx('charged')}
 function transUpdate(){tr.t++;
-  if(tr.t===60){const sc=score,am=ammo+bossNuts,pw=power;LV=2;reset();score=sc;ammo=am;power=pw}
+  if(tr.t===60){unlockSave();const sc=score,am=ammo+bossNuts,pw=power;LV=2;reset();score=sc;ammo=am;power=pw}
   if(tr.t>=210){tr.on=false;state='play';msg={s:'Level 2: faster foes and wider gaps!',l:170}}}
 function reset(){
   applyLevel(LV);hearts=3;score=0;inv=0;ps=[];camX=0;
   p={x:60,y:290,w:40,h:80,vx:0,vy:0,ground:false,face:1,hurtT:0,land:0,air:1,coy:0,bounce:0,sl:0,th:0,onLog:false};power=0;ammo=0;bossNuts=0;sup=[];quake=[];jbuf=0;nuts=[];nutCD=0;camV=0;msg={s:'',l:0};safe={x:60,y:290};bossReset();dnH=false;
-  flies=FLY.map(a=>({x:a[0],y:a[1],got:false}));
+  {const cs=new Set(COL[LV]||[]);flies=FLY.map((a,i)=>({x:a[0],y:a[1],got:cs.has(i),i}))}
   foes=FOES.map(a=>({k:a[0],x:a[1],y:a[2],a:a[3],b:a[4],d:a[5],alive:true,dead:0}));
   hpick=HEARTS.map(a=>({x:a[0],y:a[1],got:false}));
 }
@@ -338,7 +345,7 @@ function update(){
       else{const dir=p.x+p.w/2<bx+b[2]/2?-1:1;p.x=dir<0?bx+6-p.w:bx+b[2]-6;hurt(dir)}}}
   for(const f of pads){if(f.pop)f.pop--;
     if(p.vy>0&&p.x+p.w>f.x-34&&p.x<f.x+34&&p.y+p.h>f.y-30&&p.y+p.h<f.y+10){p.vy=-21.5;p.ground=false;p.bounce=1;p.air=1;f.pop=14;burst(f.x,f.y-30,'#7ff3ff',16,4);sfx('boing')}}
-  for(const f of flies){if(!f.got&&Math.hypot(f.x-(p.x+20),f.y+Math.sin(t/20+f.x)*6-(p.y+p.h*.45))<36){f.got=true;score++;sfx('coin');burst(f.x,f.y,'#ffe27a',14);
+  for(const f of flies){if(!f.got&&Math.hypot(f.x-(p.x+20),f.y+Math.sin(t/20+f.x)*6-(p.y+p.h*.45))<36){f.got=true;score++;(RUNCOL[LV]=RUNCOL[LV]||[]).push(f.i);sfx('coin');burst(f.x,f.y,'#ffe27a',14);
     power++;if(power>=NUT_NEED){power=0;ammo+=10;sfx('charged');burst(p.x+20,p.y+30,'#ffd23f',34,5);msg={s:'+10 NUTS!  '+(COARSE?'Tap the nut button':'Press X')+' to throw',l:150}}}}
   if(nutCD>0)nutCD--;if(msg.l>0)msg.l--;
   const th=!!Th();
@@ -532,10 +539,10 @@ let lastUI='';
 let lastP=-1;
 function syncPad(){const tn=ammo+bossNuts,k=tn*100+power;if(k===lastP)return;lastP=k;const b=$('bp');b.style.setProperty('--p',power/NUT_NEED);b.classList.toggle('full',tn>0);$('bpc').textContent=tn}
 function syncUI(){const pb=$('pause');pb.style.display=(state==='play'||state==='pause')?'grid':'none';$('home').style.display=(state==='play'||state==='pause'||state==='over'||state==='win')?'grid':'none';pb.classList.toggle('paused',state==='pause');if(state===lastUI)return;lastUI=state;const m=state==='title'||state==='select';$('wrap').classList.toggle('menu',m);$('ui').classList.toggle('off',!m);$('title').classList.toggle('hide',state!=='title');$('select').classList.toggle('hide',state!=='select');if(m)$('wal').textContent=wallet}
-function showSelect(){if(state!=='title')return;if(!AUTH.user){sfx('click');openAuth();return}state='select';sfx('click')}
-function startRun(){if(state!=='select')return;sfx('click');LV=1;reset();state='play'}
-function toTitle(){state='title';tr.on=false}
-function endRun(s){if(state!=='play')return;state=s;wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}cloudSave(s,score)}
+function showSelect(){if(state!=='title')return;if(!AUTH.user){sfx('click');openAuth();return}state='select';sfx('click');if(SELLV>MAXLV)SELLV=1;drawLvs()}
+function startRun(){if(state!=='select')return;sfx('click');RUNCOL={1:[],2:[]};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
+function toTitle(){state='title';tr.on=false;RUNCOL={1:[],2:[]}}
+function endRun(s){if(state!=='play')return;state=s;wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(s,score)}
 const LOCK='<svg viewBox="0 0 64 64"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#dfe6ee" stroke-width="6" stroke-linecap="round"/><rect x="12" y="28" width="40" height="28" rx="8" fill="#e9b949" stroke="#7a4a0a" stroke-width="3"/><circle cx="32" cy="41" r="4" fill="#7a4a0a"/></svg>';
 const HEROES=[{n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]]},0,0,0];
 function showHero(i){const h=HEROES[i];$('pName').textContent=h.n;$('pRole').textContent=h.role;$('bars').innerHTML=h.st.map(a=>`<div class="bar"><span>${a[0]}</span><i><b style="width:${a[1]*100}%"></b></i></div>`).join('');document.querySelectorAll('.tile').forEach((t,k)=>t.classList.toggle('on',k===i))}
@@ -548,7 +555,7 @@ function buildUI(){
   showHero(0);
   document.querySelectorAll('.tile').forEach((c,i)=>c.addEventListener('click',()=>{if(HEROES[i]){showHero(i);$('note').textContent='More heroes are on the way';sfx('click')}else{sfx('nope');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');$('note').textContent='Locked. Heroes will unlock with coins soon.'}}));
   $('play').onclick=showSelect;$('start').onclick=startRun;$('back').onclick=()=>{state='title';sfx('click')};
-  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(x){}cloudSave('quit',score)}toTitle();sfx('click')});
+  $('home').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'||state==='pause'){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(x){}bankRun();cloudSave('quit',score)}toTitle();sfx('click')});
   $('pause').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play')state='pause';else if(state==='pause')state='play'});
   if(COARSE)$('hint').textContent='Tap PLAY - the game goes fullscreen (landscape)';
   $('snd').onclick=()=>{AU.on=!AU.on;if(AU.master)AU.master.gain.value=AU.on?1:0;$('snd').textContent=AU.on?'🔊':'🔇';auStart()};
@@ -560,6 +567,16 @@ const LS={g:k=>{try{return localStorage.getItem(k)}catch(e){return null}},s:(k,v
 async function hashPw(p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('oakie:'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'x'+btoa(p)}}
 const accs=()=>{try{return JSON.parse(LS.g('gw_acc')||'{}')}catch(e){return{}}};
 let FB=null,DB=null,CSYNC=null,BEST=0,MAXLV=1;
+let COL={1:[],2:[]},RUNCOL={1:[],2:[]},SELLV=1;
+function normCol(c){const o={1:[],2:[]};if(c)for(const k of [1,2])if(Array.isArray(c[k]))o[k]=c[k].map(Number).filter(Number.isFinite);return o}
+try{COL=normCol(JSON.parse(LS.g('gw_col')||'null'));MAXLV=+LS.g('gw_maxlv')||1}catch(e){}
+function bankRun(){for(const n of [1,2]){const a=RUNCOL[n];if(a&&a.length){const st=new Set(COL[n]||[]);a.forEach(i=>st.add(i));COL[n]=[...st].sort((x,y)=>x-y)}RUNCOL[n]=[]}
+  if(LV>MAXLV)MAXLV=LV;LS.s('gw_col',JSON.stringify(COL));LS.s('gw_maxlv',MAXLV)}
+function drawLvs(){const box=$('lvs');if(!box)return;
+  box.innerHTML=[1,2].map(n=>{const tot=LVD[n].FLY.length,left=Math.max(0,tot-(COL[n]||[]).length),lk=n>MAXLV;
+    return '<div class="lv'+(n===SELLV?' on':'')+(lk?' lk':'')+'" data-n="'+n+'">Level '+n+'<small>'+(lk?'&#128274; Beat level '+(n-1):(left>0?left+' coins left':'All coins found'))+'</small></div>'}).join('');
+  box.querySelectorAll('.lv').forEach(el=>el.onclick=()=>{const n=+el.dataset.n;if(n>MAXLV){sfx('nope');$('note').textContent='Beat Level '+(n-1)+' to unlock this.';return}SELLV=n;sfx('click');$('note').textContent='';drawLvs()})}
+function unlockSave(){MAXLV=Math.max(MAXLV,2);LS.s('gw_maxlv',MAXLV);if(DB&&CSYNC){try{DB.collection('users').doc(CSYNC).set({maxLevel:MAXLV},{merge:true}).catch(()=>{})}catch(e){}}}
 const FV=()=>FB.firestore.FieldValue;
 async function cloudLogin(){
   if(!DB||!FB||!FB.auth().currentUser||!AUTH.user)return;
@@ -567,11 +584,11 @@ async function cloudLogin(){
   const ref=DB.collection('users').doc(u.uid);
   try{
     const sn=await ref.get();
-    if(sn.exists){const d=sn.data();wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;
+    if(sn.exists){const d=sn.data();wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;COL=normCol(d.collected);
       await ref.set({name:AUTH.user.name,email:u.email,lastLogin:FV().serverTimestamp(),loginCount:FV().increment(1)},{merge:true})}
-    else{wallet=0;BEST=0;MAXLV=1;
-      await ref.set({name:AUTH.user.name,email:u.email,createdAt:FV().serverTimestamp(),lastLogin:FV().serverTimestamp(),loginCount:1,coins:0,bestScore:0,runs:0,wins:0,maxLevel:1,hero:0})}
-    LS.s('gw_coins',wallet);
+    else{wallet=0;BEST=0;MAXLV=1;COL={1:[],2:[]};
+      await ref.set({name:AUTH.user.name,email:u.email,createdAt:FV().serverTimestamp(),lastLogin:FV().serverTimestamp(),loginCount:1,coins:0,bestScore:0,runs:0,wins:0,maxLevel:1,hero:0,collected:{1:[],2:[]}})}
+    LS.s('gw_coins',wallet);LS.s('gw_col',JSON.stringify(COL));LS.s('gw_maxlv',MAXLV);RUNCOL={1:[],2:[]};if(SELLV>MAXLV)SELLV=1;try{$('wal').textContent=wallet}catch(e){}drawLvs();
   }catch(e){CSYNC=null}
 }
 function cloudSave(how,sc){
@@ -579,7 +596,7 @@ function cloudSave(how,sc){
   try{
     const d={coins:wallet,lastPlayed:FV().serverTimestamp(),runs:FV().increment(1)};
     if(sc>BEST){BEST=sc;d.bestScore=BEST}
-    if(typeof LV==='number'&&LV>MAXLV){MAXLV=LV;d.maxLevel=LV}
+    d.maxLevel=MAXLV;d.collected=COL;
     if(how==='win')d.wins=FV().increment(1);
     DB.collection('users').doc(CSYNC).set(d,{merge:true}).catch(()=>{});
   }catch(e){}
@@ -593,7 +610,7 @@ const BE={
   async out(){if(FB)try{await FB.auth().signOut()}catch(e){}}
 };
 const ERR={'auth/email-already-in-use':'That email already has an account. Please sign in.','auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs at least 6 characters.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No internet connection.','local/noreset':'Reset emails need the online setup. Not switched on yet.'};
-function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');wallet=0;BEST=0;MAXLV=1;CSYNC=null}drawWho()}
+function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');LS.d('gw_col');LS.d('gw_maxlv');wallet=0;BEST=0;MAXLV=1;COL={1:[],2:[]};RUNCOL={1:[],2:[]};SELLV=1;CSYNC=null}drawWho()}
 function drawWho(){const w=$('who');if(!w)return;const show=AUTH.user&&(state==='title'||state==='select');w.style.display=show?'block':'none';if(show)w.innerHTML='&#128100; '+AUTH.user.name.replace(/[<>&]/g,'')+'<small>logged in</small>'}
 function aMsg(t,ok){const m=$('aMsg');m.textContent=t||'';m.className=ok?'ok':''}
 function aShake(){const c=$('acard');c.classList.remove('shk');void c.offsetWidth;c.classList.add('shk');sfx('nope')}
