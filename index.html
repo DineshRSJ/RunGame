@@ -399,11 +399,77 @@ function buildLong(n,seedO){
   for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],gx=(a[0]+a[1]+b[0])/2,gy=Math.min(a[2],b[2])-125;C.push([gx-45,gy+35],[gx,gy],[gx+45,gy+35])}
   FL.forEach(f=>{for(let x2=f.x+30;x2<=f.x+f.w-30;x2+=40)C.push([x2,f.y-48])});
   return{plats:pl,pads,FLY:C,FOES:foes,HEARTS,HAZ:haz,BR:br,POT,L:7760+AO_,AO:AO_}}
+// ---------- voices (device speech) ----------
+let csMode='ep4',csHold=0,IN=null,INTRO_SEEN=false;
+const VOX={narr:{p:1,r:.93,c:'#fff3cf',n:'Narrator'},oak:{p:1.7,r:1.05,c:'#ffc86a',n:'Oakie'},bro:{p:2,r:1.12,c:'#9dffb0',n:'Little Oakie'},toad:{p:.45,r:.82,c:'#9be86a',n:'Toad King'},lord:{p:.15,r:.75,c:'#d29bff',n:VNAME}};
+let vBusy=false,vTok=0,vT0=0,vStarted=false;
+function voiceStop(){vTok++;vBusy=false;try{speechSynthesis.cancel()}catch(e){}}
+function say(who,text){voiceStop();const v=VOX[who];if(!AU.on||!('speechSynthesis' in window)||!v)return;
+  try{const u=new SpeechSynthesisUtterance(text),tok=vTok,vs=speechSynthesis.getVoices();u.pitch=v.p;u.rate=v.r;u.volume=1;u.lang='en-US';
+    const vo=vs.find(x=>/^en[-_](US|GB)/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang));if(vo)u.voice=vo;
+    u.onstart=()=>{if(tok===vTok)vStarted=true};u.onend=u.onerror=()=>{if(tok===vTok)vBusy=false};vBusy=true;vStarted=false;vT0=performance.now();speechSynthesis.speak(u)}catch(e){vBusy=false}}
+const voiceBusy=()=>vBusy&&(vStarted?performance.now()-vT0<20000:performance.now()-vT0<1800);
+function cutTrack(){if(csMode==='intro')return IN?IN.trk:'game';return cs.t<560?'game':cs.t<880?'tense':'boss'}
+function skipCut(){if(csMode==='intro'){if(IN&&IN.T>20)endIntro()}else if(cs.t>30)endCut()}
+// ---------- opening story (before Level 1) ----------
+let BRO=null;const bro=k=>{if(!BRO){BRO={};['idle','runA','runB','hurt','jump'].forEach(n=>{BRO[n]=recolor(IM0[n],'bro'+n,[85,1.1,1.1],null,null,1)})}return BRO[k]};
+function startIntro(){voiceStop();state='cut';csMode='intro';LV=1;applyLevel(1);const IP={x:300,y:370,w:1500,f:false,dx:0,dy:0};mkPlat(IP);plats=[IP];pads=[];HAZ=[];BR=[];flies=[];foes=[];hpick=[];pots=[];bossReset();boss.on=false;ps=[];nuts=[];waves=[];sup=[];quake=[];camX=450;camV=0;shake=0;msg={s:'',l:0};
+  IN={i:0,f:0,T:0,trk:'game',dark:0,dk:0,fl:0,shk:0,fade:1,cap:null,ok:{x:480,y:0,pose:'walk',face:1},td:{x:1800,y:0,vis:0,pose:'idle',flip:1,a:1},ld:{x:2000,y:0,vis:0,pose:'idle',flip:1,a:1},br:{x:380,y:0,vis:0,pose:'idle',held:0}};IN.steps=mkIntro()}
+function endIntro(){voiceStop();LS.s('gw_intro','1');INTRO_SEEN=true;csMode='ep4';IN=null;ps=[];shake=0;state='levels';startRun()}
+function mkIntro(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*Math.PI))*26:0};
+  return[
+  {trk:'game',min:70,say:['narr','In the peaceful Acorn Forest, a happy little hero named Oakie was out for a morning walk.'],u:f=>{const o=I().ok;o.x=Math.min(780,o.x+1.15);o.pose=o.x<780?'walk':'idle'}},
+  {min:50,say:['oak','What a beautiful day for a walk!'],u:f=>{const o=I().ok;o.pose='idle';if(f===4)sfx('jump');hop(o,f-4,36)}},
+  {trk:'tense',min:110,say:['narr','But suddenly... two terrible villains appeared!'],u:f=>{const a=I();if(f===1){sfx('thunder');a.fl=1}a.dk=.5;a.shk=f<40?5:0;a.td.vis=1;a.ld.vis=1;a.td.x=Math.max(1160,a.td.x-9);a.ld.x=Math.max(1330,a.ld.x-7);a.ld.y=Math.sin(f/12)*5;a.ok.pose='idle'}},
+  {min:50,say:['toad','Ribbit! Give us the Secret Potion Tank, little acorn!'],u:f=>{const a=I();a.ld.y=Math.sin(f/12)*5;hop(a.td,f,24)}},
+  {min:50,say:['lord','The tank of Unlimited Life... Show it to us! Now!'],u:f=>{const a=I();a.ld.y=Math.sin(f/12)*5}},
+  {min:50,say:['oak','No way! I will never show you!'],u:f=>{const a=I();a.ld.y=Math.sin(f/12)*5;a.ok.pose=f<24?'jump':'idle';hop(a.ok,f,24)}},
+  {trk:'boss',min:190,say:['lord','Get him!'],u:f=>{const a=I(),td=a.td,ok=a.ok;a.ld.y=Math.sin(f/12)*5;
+    if(f>=20&&f<60){const k=(f-20)/40;td.pose='jump';td.x=1160-k*360;td.y=-Math.sin(k*Math.PI)*120;if(f===20)sfx('jump')}
+    if(f===60){td.pose='idle';td.y=0;sfx('stomp');sfx('hurt');burst(ok.x-camX+20,330,'#ffd23f',16,5);a.shk=16;a.fl=.8;ok.pose='hurt'}
+    if(f>60&&ok.x>520)ok.x-=4;
+    if(f>=75&&f<105){a.ld.x-=14}if(f===105){sfx('stomp');a.shk=14;burst(a.ld.x-camX,350,'#c58bff',14,5)}}},
+  {min:110,say:['bro','Stop! Please stop hurting my big brother!'],u:f=>{const a=I(),b=a.br;b.vis=1;a.ok.pose='hurt';a.ld.y=Math.sin(f/12)*5;if(f===2)sfx('boing');if(b.x<560){b.x+=2.6;b.pose=Math.floor(f/7)%2?'runA':'runB'}else{b.pose='idle';b.y=0}}},
+  {trk:'tense',min:100,say:['lord','Ha ha ha! How sweet! A little acorn! Grab him!'],u:f=>{const a=I(),td=a.td,b=a.br;a.ok.pose='hurt';a.ld.y=Math.sin(f/12)*5;if(td.x>640)td.x-=3.4;if(a.ld.x>800)a.ld.x-=2;if(f>=70){b.held=1;b.x=td.x-48;b.y=-46;if(f===70)sfx('nope')}}},
+  {min:140,say:['bro','Help! Big brother, help me!'],u:f=>{const a=I(),td=a.td,b=a.br,ld=a.ld,ok=a.ok;td.flip=-1;ld.flip=-1;ld.y=Math.sin(f/12)*5;
+    if(f>8){td.x+=4.6;ld.x+=4.6}b.x=td.x-48;b.y=-46+Math.sin(f/3)*4;b.pose='hurt';
+    if(f>30)ok.pose='idle';if(td.x>1420){td.a=Math.max(0,td.a-.05);ld.a=td.a;b.a=td.a;if(td.a>0&&f%4===0)burst(td.x-camX,330,'#6a2ad0',4,3)}
+    if(f===50)sfx('thunder')}},
+  {trk:'sad',min:100,say:['oak','No! Little brother! Wait for me!'],u:f=>{const a=I(),ok=a.ok;a.dk=.3;a.td.vis=a.ld.vis=a.br.vis=0;if(ok.x<980){ok.x+=3.2;ok.pose='walk';if(f%24===0)sfx('stomp')}else ok.pose='idle'}},
+  {min:170,say:['narr','The villains vanished, and took Oakie\'s little brother with them. Now Oakie must run through the forest... and save him!'],u:f=>{const a=I();a.dk=.12;a.ok.pose='idle'}},
+  {trk:'game',min:150,say:['narr','Run, Oakie, run!'],u:f=>{const a=I();a.dk=0;a.ok.pose=f<20?'idle':'walk';if(f>20)a.ok.x+=2.2;if(f===20)sfx('jump')},last:1}]}
+function introUpdate(){const S=IN.steps[IN.i];if(!S){endIntro();return}
+  if(IN.f===0){if(S.trk)IN.trk=S.trk;S.m=Math.max(S.min,S.say?S.say[1].length*4.2:0);if(S.say){say(S.say[0],S.say[1]);IN.cap={who:S.say[0],text:S.say[1],f:0}}}
+  IN.T++;S.u&&S.u(IN.f,IN);IN.f++;if(IN.cap)IN.cap.f++;
+  IN.dark+=(IN.dk-IN.dark)*.04;if(IN.fl>0)IN.fl-=.04;if(IN.shk>0)IN.shk-=.4;shake=IN.shk;
+  IN.fade=IN.T<40?1-IN.T/40:(S.last&&IN.f>S.m-45?Math.min(1,(IN.f-(S.m-45))/45):0);
+  ps.forEach(a=>{a.x+=a.vx;a.y+=a.vy;a.vy+=.08;a.l--});ps=ps.filter(a=>a.l>0);
+  if(IN.f>=S.m&&!voiceBusy()||IN.f>S.m+900){IN.i++;IN.f=0}}
+function drawIntroActors(){const a=IN,gy=372,T=a.T;
+  const ld=a.ld,td=a.td,ok=a.ok,br=a.br;
+  if(ld.vis&&(ld.a==null||ld.a>0)){const im=IM.vIdle;g.save();g.globalAlpha=ld.a;shadow(ld.x,gy,70,ld.a);sp(im,ld.x-camX,gy+ld.y-8,im.height*.68,ld.flip,1,1,.5);g.restore()}
+  if(td.vis&&td.a>0){const im=td.pose==='jump'?IM.bossJump:IM.bossIdle;g.save();g.globalAlpha=td.a;shadow(td.x,gy,70,td.a);sp(im,td.x-camX,gy+td.y+2,im.height*BF,td.flip,1,1+(td.pose==='idle'?Math.sin(T/14)*.012:0),.5);g.restore()}
+  {const k=ok.pose;let im=IM.idle,bob=Math.sin(T/18)*-1.2;if(k==='walk'){im=(Math.floor(T/7)%2)?IM.runA:IM.runB;bob=Math.abs(Math.sin(T/7*Math.PI))*-3}else if(k==='hurt'){im=IM.hurt;bob=0}else if(k==='jump'){im=IM.jump;bob=0}
+    const sh=a.T%2&&a.shk>6?(Math.random()-.5)*3:0;shadow(ok.x,gy,30,1);sp(im,ok.x-camX+sh,gy+ok.y+bob+3,104,ok.face,1,1,.62)}
+  if(br.vis&&(br.a==null||br.a>0)){const im=bro(br.pose==='runA'||br.pose==='runB'||br.pose==='hurt'?br.pose:'idle'),dh=66*im.height/bro('idle').height;g.save();if(br.a!=null)g.globalAlpha=br.a;if(!br.held)shadow(br.x,gy,18,1);
+    g.translate(br.x-camX,gy+br.y+(br.held?0:Math.sin(T/16)*-1));if(br.held)g.rotate(Math.sin(T/5)*.12);const dw=im.width*dh/im.height;g.drawImage(im,-dw*.5,-dh,dw,dh);g.restore()}}
+function drawIntroFX(){const a=IN;if(a.dark>.01){g.fillStyle='rgba(20,6,40,'+a.dark+')';g.fillRect(0,0,W,H)}
+  if(a.fl>0){g.fillStyle='rgba(255,255,255,'+a.fl*.8+')';g.fillRect(0,0,W,H)}
+  g.fillStyle='#000';g.fillRect(0,0,W,46);g.fillRect(0,H-46,W,46);
+  if(a.cap){const c=a.cap,v=VOX[c.who],txt=c.text.slice(0,Math.floor(c.f/1.2)),k=Math.min(1,c.f/14);g.save();g.globalAlpha=k;g.fillStyle='rgba(8,4,16,.66)';g.beginPath();g.roundRect(W/2-420,56,840,78,16);g.fill();g.textAlign='center';g.lineJoin='round';
+    g.font='700 20px Fredoka,sans-serif';g.fillStyle=v.c;g.fillText(v.n,W/2,82);g.font='600 25px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=5;g.strokeStyle='#1a0a2a';
+    const words=txt.split(' ');let l1='',l2='';for(const w of words){if((l1+' '+w).length<56&&!l2)l1=(l1?l1+' ':'')+w;else l2=(l2?l2+' ':'')+w}
+    if(l2){g.font='600 21px Fredoka,sans-serif';g.strokeText(l1,W/2,106);g.fillStyle='#fff3cf';g.fillText(l1,W/2,106);g.strokeText(l2,W/2,128);g.fillText(l2,W/2,128)}else{g.strokeText(l1,W/2,114);g.fillStyle='#fff3cf';g.fillText(l1,W/2,114)}g.restore()}
+  if(a.i===a.steps.length-1){const k=Math.min(1,a.f/30)*(1-a.fade);g.save();g.globalAlpha=k;g.textAlign='center';g.lineJoin='round';g.font='700 92px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=13;g.strokeStyle='#3a1a0a';g.strokeText('LEVEL 1',W/2,H/2+10);g.fillStyle='#ffd23f';g.fillText('LEVEL 1',W/2,H/2+10);g.font='600 32px Fredoka,sans-serif';g.fillStyle='#fff3cf';g.fillText('Forest Run',W/2,H/2+56);g.restore()}
+  if(a.fade>0){g.fillStyle='rgba(0,0,0,'+a.fade+')';g.fillRect(0,0,W,H)}
+  g.save();g.font='500 16px Fredoka,sans-serif';g.textAlign='right';g.fillStyle='#ffffffaa';g.fillText('Tap to skip',W-24,H-14);g.restore()}
 // ---------- story cutscene after level 4 ----------
 let cs={t:0,fl:0};
-function startCut(){state='cut';cs={t:0,fl:0};inv=0;nuts=[];waves=[];quake=[];sup=[];ps=[];shake=0;p.vx=p.vy=0;p.ground=true;p.h=80;p.face=1;p.th=0;p.sl=0;p.hurtT=0;boss.x=7240+AO;boss.y=370;boss.fade=null;boss.st='defeated';boss.on=true;p.x=6900+AO;p.y=290;camX=L-VW}
-function endCut(){boss.fade=null;state='levels';SELLV=5;drawLvs();$('lnote').textContent='The Toad King is defeated!  '+VNAME+' awaits in Level 5...'}
-function cutUpdate(){const T=++cs.t;
+function startCut(){csMode='ep4';csHold=0;state='cut';cs={t:0,fl:0};inv=0;nuts=[];waves=[];quake=[];sup=[];ps=[];shake=0;p.vx=p.vy=0;p.ground=true;p.h=80;p.face=1;p.th=0;p.sl=0;p.hurtT=0;boss.x=7240+AO;boss.y=370;boss.fade=null;boss.st='defeated';boss.on=true;p.x=6900+AO;p.y=290;camX=L-VW}
+function endCut(){voiceStop();boss.fade=null;state='levels';SELLV=5;drawLvs();$('lnote').textContent='The Toad King is defeated!  '+VNAME+' awaits in Level 5...'}
+function cutUpdate(){if(csMode==='intro')return introUpdate();
+  if(csHold<420&&voiceBusy()&&CAPS.some(c=>cs.t===c[1]-1)){csHold++;return}csHold=0;
+  const T=++cs.t;for(const c of CAPS)if(T===c[0])say(c[3]||'narr',c[4]||c[2]);if(T===1135)say('narr','Now Oakie must run, and save his little brother!');
   if(T>=70&&T<250){const k=((T-70)%60)/60,h=Math.sin(k*Math.PI)*46;p.y=290-h;p.ground=h<2}else{p.y=290;p.ground=true}
   p.vy=0;p.vx=0;
   if(T===300)sfx('charged');
@@ -415,14 +481,14 @@ function cutUpdate(){const T=++cs.t;
   if(cs.fl>0)cs.fl-=.04;
   ps.forEach(a=>{a.x+=a.vx;a.y+=a.vy;a.vy+=.08;a.l--});ps=ps.filter(a=>a.l>0);
   if(T>1560)endCut()}
-const CAPS=[[40,270,'The Toad King falls... and the whole forest cheers!'],[290,490,'His curse fades away like morning mist.'],[505,590,'Peace at last...'],[610,890,'But something darker stirs beyond the mountains...'],[905,1100,VNAME+' awakens.']];
+const CAPS=[[40,270,'The Toad King falls... and the whole forest cheers!'],[290,490,'His curse fades away like morning mist.'],[505,590,'Peace at last...'],[610,890,'But something darker stirs beyond the mountains...'],[905,1100,VNAME+': "The Secret Potion Tank will be mine!"','lord','The Secret Potion Tank will be mine! And the little acorn is mine too!']];
 let VSIL=null;
 function drawVillain(a,T){const im=IM.vIdle;if(!VSIL){VSIL=document.createElement('canvas');VSIL.width=im.width;VSIL.height=im.height;const x=VSIL.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#05020b';x.fillRect(0,0,im.width,im.height)}
   g.save();g.globalAlpha=a;const cx=W*.72,cy=H*.62+Math.sin(T/40)*8,h=330,w=h*im.width/im.height,rev=T>=820;
   let gr=g.createRadialGradient(cx,cy-120,10,cx,cy-120,280);gr.addColorStop(0,rev?'#6a1ab0aa':'#2a0a3acc');gr.addColorStop(1,'#2a0a3a00');g.fillStyle=gr;g.fillRect(cx-280,cy-400,560,560);
   g.drawImage(rev?im:VSIL,cx-w/2,cy-h,w,h);g.restore();
   if(T>=940){const k=Math.min(1,(T-940)/50)*(T>1060?Math.max(0,1-(T-1060)/30):1);g.save();g.globalAlpha=k;g.drawImage(IM.vPortrait,0,0,W,H);g.restore()}}
-function drawCutFX(){const T=cs.t;
+function drawCutFX(){if(csMode==='intro')return drawIntroFX();const T=cs.t;
   const dk=T<560?0:T>700?.6:(T-560)/140*.6;if(dk>0){g.fillStyle='rgba(20,6,40,'+dk+')';g.fillRect(0,0,W,H)}
   if(T>700&&T<1120)drawVillain(Math.min(1,(T-700)/160),T);
   if(cs.fl>0){g.fillStyle='rgba(255,255,255,'+cs.fl*.8+')';g.fillRect(0,0,W,H)}
@@ -434,7 +500,7 @@ function drawCutFX(){const T=cs.t;
     if(T>1130){const k=Math.min(1,(T-1130)/40);g.save();g.globalAlpha=k;g.textAlign='center';g.lineJoin='round';
       g.font='700 100px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=14;g.strokeStyle='#3a1a0a';g.strokeText('LEVEL 5',W/2,H/2-10);g.fillStyle='#ffd23f';g.fillText('LEVEL 5',W/2,H/2-10);
       g.font='600 34px Fredoka,sans-serif';g.fillStyle='#ff8a6a';g.fillText(VNAME.toUpperCase()+' RISES',W/2,H/2+44);
-      g.font='500 24px Fredoka,sans-serif';g.fillStyle='#cdb8ee';g.fillText('A new adventure begins...',W/2,H/2+88);
+      g.font='500 24px Fredoka,sans-serif';g.fillStyle='#cdb8ee';g.fillText('Save the little acorn!',W/2,H/2+88);
       if(T>1250&&Math.floor(T/30)%2){g.font='500 20px Fredoka,sans-serif';g.fillStyle='#ffffffaa';g.fillText('Tap to continue',W/2,H-60)}g.restore()}}
   if(T>=40&&T<1090){g.save();g.font='500 16px Fredoka,sans-serif';g.textAlign='right';g.fillStyle='#ffffff88';g.fillText('Tap to skip',W-24,H-14);g.restore()}}
 function applyLevel(n){LV=n;const d=LVD[n];L=d.L||7760;AO=L-7760;plats=d.plats;pads=d.pads;FLY=d.FLY;FOES=d.FOES;POTXY=d.POT;HEARTS=d.HEARTS;HAZ=d.HAZ;BR=d.BR}
@@ -448,10 +514,10 @@ function reset(){
   foes=FOES.map(a=>({k:a[0],x:a[1],y:a[2],a:a[3],b:a[4],d:a[5],alive:true,dead:0}));
   hpick=HEARTS.map(a=>({x:a[0],y:a[1],got:false}));pots=POTXY.map((a,i)=>({x:a[0],y:a[1],i,got:!!(POTS[LV]&&POTS[LV][i])}));
 }
-function init(){plats.forEach(q=>{if(!q.f)mkPlat(q)});LVD[2]=buildL2();LVD[2].plats.forEach(q=>{if(!q.f)mkPlat(q)});LVD[3]=buildLong(3);LVD[4]=buildLong(4);LVD[5]=buildLong(5);[3,4,5].forEach(n=>LVD[n].plats.forEach(q=>{if(!q.f)mkPlat(q)}));reset();buildUI();initStore();authInit();applySkin();requestAnimationFrame(loop)}
+function init(){INTRO_SEEN=LS.g('gw_intro')==='1';plats.forEach(q=>{if(!q.f)mkPlat(q)});LVD[2]=buildL2();LVD[2].plats.forEach(q=>{if(!q.f)mkPlat(q)});LVD[3]=buildLong(3);LVD[4]=buildLong(4);LVD[5]=buildLong(5);[3,4,5].forEach(n=>LVD[n].plats.forEach(q=>{if(!q.f)mkPlat(q)}));reset();buildUI();initStore();authInit();applySkin();requestAnimationFrame(loop)}
 // ---- input ----
 const keys={},touch={};
-const go=()=>{if(state==='cut'){if(cs.t>30)endCut();return}if(state==='over'||state==='win'){if(state==='win'){state='levels';SELLV=Math.min(MAXLV,LV);drawLvs();$('lnote').textContent=lvNote();return}const atB=state==='over'&&boss.on;reset();if(atB){p.x=6820+AO;p.y=290;camX=6560+AO;safe={x:6820+AO,y:290}}state='play'}else if(state==='pause')state='play'};
+const go=()=>{if(state==='cut'){skipCut();return}if(state==='over'||state==='win'){if(state==='win'){state='levels';SELLV=Math.min(MAXLV,LV);drawLvs();$('lnote').textContent=lvNote();return}const atB=state==='over'&&boss.on;reset();if(atB){p.x=6820+AO;p.y=290;camX=6560+AO;safe={x:6820+AO,y:290}}state='play'}else if(state==='pause')state='play'};
 addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();if(e.code==='Space'||e.code==='Enter'){if(state==='title')showSelect();else if(state==='select')showLevels();else if(state==='levels')startRun();else go()}if(e.code==='KeyP'||e.code==='Escape'){if(state==='play')state='pause';else if(state==='pause')state='play';else if(e.code==='Escape'){if(state==='store')closeStore();else if(state==='levels')state='select';else toTitle()}}});
 addEventListener('keyup',e=>keys[e.code]=0);
 // multi-touch pads: every finger tracks the button it is on, sliding between buttons works
@@ -709,7 +775,7 @@ function drawBossBar(){const b=boss;if(!b.on)return;const im=IM.bar,w=340,h=w*im
 function draw(){
   g.setTransform(K,0,0,K,0,0);g.clearRect(0,0,W,H);
   const menu=isMenu();drawBG();
-  if(!menu){g.save();g.translate(shake>0?(Math.random()-.5)*shake*.5:0,TY+camV+(shake>0?(Math.random()-.5)*shake*.5:0));g.scale(Z,Z);drawPlats();if(LV===1)drawTunnel();BR.forEach(drawBranch);pads.forEach(drawPad);HAZ.forEach(drawHaz);flies.forEach(drawFly);hpick.forEach(drawHP);drawPot();foes.forEach(drawFoe);drawBoss();waves.forEach(drawWave);sup.forEach(drawSup);quake.forEach(drawQuake);nuts.forEach(drawNut);drawHero();
+  if(!menu){g.save();g.translate(shake>0?(Math.random()-.5)*shake*.5:0,TY+camV+(shake>0?(Math.random()-.5)*shake*.5:0));g.scale(Z,Z);drawPlats();if(LV===1)drawTunnel();BR.forEach(drawBranch);pads.forEach(drawPad);HAZ.forEach(drawHaz);flies.forEach(drawFly);hpick.forEach(drawHP);drawPot();foes.forEach(drawFoe);drawBoss();waves.forEach(drawWave);sup.forEach(drawSup);quake.forEach(drawQuake);nuts.forEach(drawNut);if(state==='cut'&&csMode==='intro')drawIntroActors();else drawHero();
   ps.forEach(a=>{g.globalAlpha=Math.min(1,a.l/20);g.fillStyle=a.c;g.beginPath();g.arc(a.x-camX,a.y,a.r,0,7);g.fill()});g.globalAlpha=1;g.restore()}
   vig();
   if(!menu&&state!=='cut')hud();
@@ -722,7 +788,7 @@ function draw(){
   if(state==='win')banner(LV===5?VNAME+' defeated!':'Toad King defeated!',['Level '+LV+' cleared!  +'+score+' coins banked (total '+wallet+')'+'  ·  Potions '+potCount()+'/'+POT_ALL,(LV<NLV?'Level '+(LV+1)+' unlocked!   ':'')+'Press Space or tap to choose a level']);
 }
 let last=performance.now(),acc=0;
-function loop(n){if(state==='play'&&PORTRAIT.matches)state='pause';acc+=Math.min(50,n-last);last=n;while(acc>=16.67){if(state==='play')update();else{t++;if(state==='trans')transUpdate();if(state==='cut')cutUpdate()}acc-=16.67}if(isMenu())camX=(L-VW)*(.5+.5*Math.sin(t/420));syncUI();syncPad();if(AU.ctx&&AU.ctx.state==='running')setTrack(isMenu()?'menu':state==='cut'?(cs.t>560?'boss':'game'):(state!=='trans'&&boss&&boss.on&&boss.st!=='defeated'?'boss':'game'));draw();requestAnimationFrame(loop)}
+function loop(n){if(state==='play'&&PORTRAIT.matches)state='pause';acc+=Math.min(50,n-last);last=n;while(acc>=16.67){if(state==='play')update();else{t++;if(state==='trans')transUpdate();if(state==='cut')cutUpdate()}acc-=16.67}if(isMenu())camX=(L-VW)*(.5+.5*Math.sin(t/420));syncUI();syncPad();duck();if(AU.ctx&&AU.ctx.state==='running')setTrack(isMenu()?'menu':state==='cut'?cutTrack():(state!=='trans'&&boss&&boss.on&&boss.st!=='defeated'?'boss':'game'));draw();requestAnimationFrame(loop)}
 // ===== UI + AUDIO =====
 let wallet=0;try{wallet=+localStorage.getItem('gw_coins')||0}catch(e){}
 const $=id=>document.getElementById(id);
@@ -734,7 +800,7 @@ function syncPad(){const tn=ammo+bossNuts,k=tn*100+power;if(k===lastP)return;las
 function syncUI(){const pb=$('pause');pb.style.display=(state==='play'||state==='pause')?'grid':'none';$('home').style.display=(state==='play'||state==='pause'||state==='over'||state==='win')?'grid':'none';pb.classList.toggle('paused',state==='pause');if(state===lastUI)return;lastUI=state;const m=isMenu();$('wrap').classList.toggle('menu',m||state==='cut');$('ui').classList.toggle('off',!m);$('title').classList.toggle('hide',state!=='title');$('select').classList.toggle('hide',state!=='select');$('levels').classList.toggle('hide',state!=='levels');$('store').classList.toggle('hide',state!=='store');if(m)setWal()}
 function showSelect(){if(state!=='title')return;if(!AUTH.user){AUTH.next=null;sfx('click');openAuth();return}state='select';sfx('click');if(SELLV>MAXLV)SELLV=1;drawSlots()}
 function showLevels(){if(state!=='select')return;sfx('click');state='levels';if(SELLV>MAXLV)SELLV=1;$('lnote').textContent=lvNote();drawLvs()}
-function startRun(){if(state!=='levels')return;sfx('click');RUNCOL=emptyCol();RUNPOT={};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
+function startRun(){if(state!=='levels')return;if(SELLV===1&&!INTRO_SEEN&&!window.NOINTRO){startIntro();return}sfx('click');RUNCOL=emptyCol();RUNPOT={};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
 function toTitle(){state='title';tr.on=false;RUNCOL=emptyCol();RUNPOT={}}
 function bankLevel(how){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(how,score)}
 function endRun(s){if(state!=='play')return;state=s;if(s==='win'){MAXLV=Math.min(NLV,Math.max(MAXLV,LV+1));LS.s('gw_maxlv',MAXLV);bankLevel('win');if(LV===4){startCut();return}}else{RUNCOL=emptyCol();RUNPOT={};cloudSave(s,0)}}
@@ -1056,10 +1122,26 @@ function bossTrack(cur,C){const tg=cur.tg,SP=60/152/4,ROOT=[40,36,38,35],CH=[[52
     if(bar===3&&st>=12)noiseHit(t0,.08,.14,tg,'bandpass',3000);
     nt+=SP;n++}}
   sched();cur.timers.push(setInterval(sched,50))}
+function duck(){const c=AU.cur;if(!c||!AU.ctx)return;const w=state==='cut'?.5:1;if(c.tg.duck!==w){c.tg.duck=w;c.tg.gain.cancelScheduledValues(AU.ctx.currentTime);c.tg.gain.setTargetAtTime(w,AU.ctx.currentTime,.4)}}
+function tenseTrack(cur,C){const tg=cur.tg,B=60/84;let n=0,nt=C.currentTime+.1;
+  const dr=C.createOscillator(),dg=C.createGain(),dl=C.createBiquadFilter();dr.type='sawtooth';dr.frequency.value=mid(31);dl.type='lowpass';dl.frequency.value=160;dg.gain.value=.09;dr.connect(dl);dl.connect(dg);dg.connect(tg);dr.start();cur.src.push(dr);
+  function sched(){if(nt<C.currentTime)nt=C.currentTime+.05;while(nt<C.currentTime+.3){const s=n%32,t0=nt;
+    if(s%4===0)tone(120,t0,.2,'sine',.5,tg,{to:40});if(s%4===1)tone(100,t0,.15,'sine',.3,tg,{to:40});
+    if(s%16===0){tone(mid(45),t0,B*4,'sawtooth',.05,tg,{a:.4,r:.8,rv:1});tone(mid(51),t0,B*4,'sawtooth',.04,tg,{a:.5,r:.8,rv:1})}
+    if(s%16===8)tone(mid(70+((s>>4)%2)),t0,B*.5,'triangle',.05,tg,{rv:1});
+    if(s%2===1)noiseHit(t0,.03,.03,tg,'highpass',7000);
+    nt+=B/2;n++}}
+  sched();cur.timers.push(setInterval(sched,60))}
+function sadTrack(cur,C){const tg=cur.tg,SP=.5,CH=[[57,60,64],[53,57,60],[48,52,55],[52,56,59]],BS=[45,41,36,40],AR=[0,1,2,1,2,1,0,1];let n=0,nt=C.currentTime+.1;
+  function sched(){if(nt<C.currentTime)nt=C.currentTime+.05;while(nt<C.currentTime+.4){const s=n%32,ci=s>>3,st=s&7,t0=nt;
+    if(st===0){tone(mid(BS[ci]),t0,SP*7,'sine',.22,tg,{a:.05,r:.5});CH[ci].forEach(x=>tone(mid(x),t0,SP*7,'sine',.035,tg,{a:.3,r:.6,rv:1}))}
+    tone(mid(CH[ci][AR[st]]+12),t0,SP*1.6,'triangle',.08,tg,{rv:1});
+    nt+=SP;n++}}
+  sched();cur.timers.push(setInterval(sched,80))}
 function stopTrack(){const c=AU.cur;if(!c)return;c.dead=true;c.timers.forEach(x=>{clearInterval(x);clearTimeout(x)});const C=AU.ctx;c.tg.gain.cancelScheduledValues(C.currentTime);c.tg.gain.setValueAtTime(c.tg.gain.value,C.currentTime);c.tg.gain.linearRampToValueAtTime(0,C.currentTime+.6);
   setTimeout(()=>{c.src.forEach(s=>{try{s.stop()}catch(e){}});try{c.tg.disconnect();c.tg.rv.disconnect()}catch(e){}},900);AU.cur=null}
-function setTrack(n){if(!AU.ctx||AU.name===n)return;stopTrack();AU.name=n;const C=AU.ctx,tg=C.createGain();tg.gain.setValueAtTime(0,C.currentTime);tg.gain.linearRampToValueAtTime(1,C.currentTime+(n==='boss'?.35:1.2));tg.connect(AU.master);
-  tg.rv=C.createGain();tg.rv.gain.value=n==='menu'?.25:n==='boss'?.35:.9;tg.rv.connect(AU.rev);const cur=AU.cur={tg,timers:[],src:[]};(n==='menu'?menuTrack:n==='boss'?bossTrack:gameTrack)(cur,C)}
+function setTrack(n){if(!AU.ctx||AU.name===n)return;stopTrack();AU.name=n;const C=AU.ctx,tg=C.createGain();tg.gain.setValueAtTime(0,C.currentTime);tg.gain.linearRampToValueAtTime(state==='cut'?.5:1,C.currentTime+(n==='boss'?.35:1.2));tg.duck=state==='cut'?.5:1;tg.connect(AU.master);
+  tg.rv=C.createGain();tg.rv.gain.value=n==='menu'?.25:n==='boss'?.35:.9;tg.rv.connect(AU.rev);const cur=AU.cur={tg,timers:[],src:[]};({menu:menuTrack,boss:bossTrack,tense:tenseTrack,sad:sadTrack}[n]||gameTrack)(cur,C)}
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
