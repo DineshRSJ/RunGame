@@ -73,18 +73,18 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 #b1 .bglow{position:absolute;left:50%;top:50%;width:90vmin;height:50vmin;transform:translate(-50%,-50%) scale(.3);background:radial-gradient(ellipse,#ffd98a40,#ffd98a00 68%);opacity:0;transition:transform 3s ease-out,opacity 2s}
 #b1.show .bglow{transform:translate(-50%,-50%) scale(1.2);opacity:1}
 #b1 .bline{height:2px;width:0;margin:2.2vmin 0;background:linear-gradient(90deg,#0000,#ffd98a,#fff,#ffd98a,#0000);box-shadow:0 0 14px #ffd98a;transition:width 1.8s cubic-bezier(.2,.7,.2,1)}
-#b1.show .bline{width:min(70vw,640px)}
-#b1 .mg{position:relative;white-space:nowrap;font-weight:700;font-size:clamp(24px,7.2vw,92px);line-height:1;letter-spacing:.8em;text-indent:.8em;text-transform:uppercase;opacity:0;filter:blur(10px);transition:letter-spacing 2.8s cubic-bezier(.15,.7,.2,1),text-indent 2.8s cubic-bezier(.15,.7,.2,1),opacity 1.6s,filter 1.6s;background:linear-gradient(100deg,#8e98a0 0%,#ffffff 38%,#ffe7a4 50%,#ffffff 62%,#8e98a0 100%);background-size:260% 100%;background-position:120% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+#b1.show .bline{width:min(46vw,380px)}
+#b1 .mg{position:relative;white-space:nowrap;font-weight:700;font-size:clamp(20px,4.6vw,56px);line-height:1;letter-spacing:.8em;text-indent:.8em;text-transform:uppercase;opacity:0;filter:blur(10px);transition:letter-spacing 2.8s cubic-bezier(.15,.7,.2,1),text-indent 2.8s cubic-bezier(.15,.7,.2,1),opacity 1.6s,filter 1.6s;background:linear-gradient(100deg,#8e98a0 0%,#ffffff 38%,#ffe7a4 50%,#ffffff 62%,#8e98a0 100%);background-size:260% 100%;background-position:120% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
 #b1.show .mg{letter-spacing:.14em;text-indent:.14em;opacity:1;filter:blur(0);animation:bshine 2.6s ease-in-out 1.6s 1 forwards}
 #b1 .bk1{font-weight:600;font-size:clamp(13px,2.4vw,26px);letter-spacing:.9em;text-indent:.9em;text-transform:uppercase;color:#ffe7a4;margin-bottom:2.4vmin;opacity:0;transform:translateY(8px);transition:opacity 1.4s .9s,transform 1.4s .9s;text-shadow:0 0 18px #ffd98a88}
 #b1.show .bk1{opacity:1;transform:none}
-#b1 .bsub{font-weight:500;font-size:clamp(11px,1.9vw,20px);letter-spacing:.7em;text-indent:.7em;color:#c9b27a;opacity:0;transition:opacity 1.2s 1.8s}
+#b1 .bsub{font-weight:500;font-size:clamp(11px,1.8vw,19px);letter-spacing:.5em;text-indent:.5em;color:#c9b27a;opacity:0;transition:opacity 1.2s 1.8s}
 #b1.show .bsub{opacity:.9}
 @keyframes bshine{0%{background-position:120% 0}100%{background-position:-20% 0}}
 #b2 .bc{max-width:min(88vw,820px)}
 #b2 .bk{font-weight:500;font-size:clamp(11px,1.8vw,18px);letter-spacing:.5em;text-indent:.5em;color:#c9b27a;text-transform:uppercase;margin-bottom:2vmin;opacity:0;transform:translateY(8px);transition:.9s .2s}
-#b2 h2{margin:0 0 3vmin;font-weight:700;font-size:clamp(24px,5.2vw,58px);line-height:1.1;color:#fff3cf;text-shadow:0 0 24px #ffd98a55;opacity:0;transform:translateY(10px);transition:.9s .5s}
-#b2 p{margin:0 auto;font-weight:400;font-size:clamp(13px,2.15vw,22px);line-height:1.55;color:#e9efe9;max-width:46em;opacity:0;transform:translateY(10px);transition:.9s 1s}
+#b2 h2{margin:0 0 2.4vmin;font-weight:700;font-size:clamp(20px,3.6vw,42px);line-height:1.1;color:#fff3cf;text-shadow:0 0 24px #ffd98a55;opacity:0;transform:translateY(10px);transition:.9s .5s}
+#b2 p{margin:0 auto;font-weight:400;font-size:clamp(13px,1.9vw,20px);line-height:1.55;color:#e9efe9;max-width:46em;opacity:0;transform:translateY(10px);transition:.9s 1s}
 #b2 .bb{display:flex;gap:2vmin;justify-content:center;flex-wrap:wrap;margin-top:4.5vmin;opacity:0;transition:opacity .9s 1.7s}
 #b2.show .bk,#b2.show h2,#b2.show p{opacity:1;transform:none}#b2.show .bb{opacity:1}
 .bbtn{font:600 clamp(13px,2vw,20px) Fredoka,sans-serif;letter-spacing:.04em;color:#fff;cursor:pointer;padding:.65em 1.6em;border-radius:2em;border:1px solid #ffffff55;background:#ffffff14}
@@ -370,8 +370,8 @@ body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 <button id="pause" aria-label="Pause"><svg class="pa" viewBox="0 0 48 48"><rect x="11" y="8" width="9" height="32" rx="3"/><rect x="28" y="8" width="9" height="32" rx="3"/></svg><svg class="pl" viewBox="0 0 48 48"><path d="M14 8 L40 24 L14 40 Z" stroke="#fff3cf" stroke-width="4" stroke-linejoin="round"/></svg></button>
 </div>
 <div id="boot"><div id="bgate">TAP TO BEGIN</div>
-  <div class="bs" id="b1"><div class="bglow"></div><div class="bk1">RatSha</div><div class="mg">Master Games</div><div class="bline"></div><div class="bsub">PRESENTS</div></div>
-  <div class="bs" id="b2"><div class="bc"><div class="bk">An Independent Production</div><h2>Made by One. Played by Many.</h2><p>This game is created, illustrated and programmed by a single independent developer, with care and a love for family adventures. If it brings a smile to your day, please consider supporting its future with a small donation. Your generosity helps fund new heroes, new worlds and regular updates.</p><div class="bb"><button class="bbtn pri" id="bDon">&#9829; Support the Developer</button><button class="bbtn" id="bGo">Continue &#9656;</button></div></div><div id="bprog"></div></div>
+  <div class="bs" id="b1"><div class="bglow"></div><div class="mg">Master Games</div><div class="bline"></div><div class="bsub">by RatSha</div></div>
+  <div class="bs" id="b2"><div class="bc"><h2>One Developer, Many Games</h2><p>This game is developed by a single person. Please support me by donating. Thanks!</p></div><div id="bprog"></div></div>
 </div>
 <div id="dnToast"></div>
 <div id="skipQ"><div class="sqc"><h3>Skip this scene?</h3><p>The story is part of the adventure. Are you sure you want to skip it?</p><div class="sqb"><button class="bbtn pri" id="sqNo">Keep watching</button><button class="bbtn" id="sqYes">Skip</button></div></div></div>
@@ -562,7 +562,7 @@ const spo=(im,cx,fy,flip,sx,sy)=>sp(im,cx,fy,im.dh||110,flip,sx,sy,im.ax==null?.
 function fixSel(){const lo=HERO===1?11:1,hi=HERO===1?MAXC:MAXLV;if(SELLV<lo||SELLV>hi)SELLV=lo}
 // ---------- voices (device speech) ----------
 let csMode='ep4',csHold=0,IN=null,INTRO_SEEN=false;
-const VOX={narr:{p:1,r:.93,c:'#fff3cf',n:'Narrator'},oak:{p:1.7,r:1.05,c:'#ffc86a',n:'Oakie'},bro:{p:2,r:1.12,c:'#9dffb0',n:'Little Oakie'},toad:{p:.45,r:.82,c:'#9be86a',n:'Toad King'},lord:{p:.15,r:.75,c:'#d29bff',n:VNAME},coco:{p:1.5,r:1.1,c:'#ffe9a8',n:'Coco'},crab:{p:.6,r:.9,c:'#ff8a6a',n:'Captain Crabbage'}};
+const VOX={narr:{p:1,r:.93,c:'#fff3cf',n:'Narrator'},oak:{p:1.7,r:1.05,c:'#ffc86a',n:'Oakie'},bro:{p:2,r:1.12,c:'#9dffb0',n:'Little Oakie'},toad:{p:.45,r:.82,c:'#9be86a',n:'Toad King'},lord:{p:.15,r:.75,c:'#d29bff',n:VNAME},coco:{p:1.5,r:1.1,c:'#ffe9a8',n:'Coco'},crab:{p:.6,r:.9,c:'#ff8a6a',n:'Captain Crabbage'},mum:{p:1.9,r:.95,c:'#ffb3d9',n:'Mama Coco'},panda:{p:1.15,r:.85,c:'#ffffff',n:'???'}};
 let vBusy=false,vTok=0,vT0=0,vStarted=false;
 function voiceStop(){vTok++;vBusy=false;try{speechSynthesis.cancel()}catch(e){}}
 function say(who,text){voiceStop();const v=VOX[who];if(!AU.on||!('speechSynthesis' in window)||!v)return;
@@ -576,9 +576,9 @@ function skipCut(){if(skipAsk)return;const ok=csMode==='intro'?(IN&&IN.T>20):cs.
 function skipAnswer(y){skipAsk=false;$('skipQ').classList.remove('on');try{speechSynthesis.resume()}catch(e){}sfx('click');if(y){if(csMode==='intro'){if(IN)endIntro()}else endCut()}}
 // ---------- opening story (before Level 1) ----------
 let BRO=null;const bro=k=>{if(!BRO){BRO={};['idle','runA','runB','hurt','jump'].forEach(n=>{BRO[n]=recolor(IM0[n],'bro'+n,[85,1.1,1.1],null,null,1)})}return BRO[k]};
-function startIntro(kind){kind=kind||'oak';voiceStop();state='cut';csMode='intro';const K=kind==='coco';LV=K?11:kind==='fin'?10:1;applyLevel(LV);const IP={x:300,y:370,w:1500,f:false,dx:0,dy:0,tf:K?1:0};mkPlat(IP);plats=[IP];pads=[];HAZ=[];BR=[];flies=[];foes=[];hpick=[];pots=[];bossReset();boss.on=false;ps=[];nuts=[];waves=[];sup=[];quake=[];camX=450;camV=0;shake=0;msg={s:'',l:0};
-  IN={i:0,f:0,T:0,trk:'game',dark:0,dk:0,fl:0,shk:0,fade:1,cap:null,ok:{x:480,y:0,pose:'walk',face:1},td:{x:1800,y:0,vis:0,pose:'idle',flip:1,a:1},ld:{x:2000,y:0,vis:0,pose:'idle',flip:1,a:1},br:{x:380,y:0,vis:0,pose:'idle',held:0},kind,ball:{x:380,vis:0,ang:0},co:{x:650,y:0,pose:'idle',vis:0},cr:{x:1900,y:0,vis:0,flip:1,a:1},st:{x:1180,y:0,vis:0,held:0,a:1},pot:{vis:0,x:720,y:-120}};IN.steps=K?mkIntroC():kind==='fin'?mkFin():mkIntro()}
-function endIntro(){voiceStop();if(IN&&IN.kind==='fin'){LS.s('gw_fin','1');csMode='ep4';IN=null;ps=[];shake=0;state='levels';SELLV=10;drawLvs();const ok=potCount()>=POT_NEED[1];$('lnote').textContent=ok?'Coco is unlocked! Pick him on the hero screen.':lvNote();toast(ok?'New hero unlocked: Coco the Coconut!':'Collect all 30 potions to unlock Coco ('+potCount()+'/30)');return}if(IN&&IN.kind==='coco'){LS.s('gw_introc','1');INTROC_SEEN=true}else{LS.s('gw_intro','1');INTRO_SEEN=true}csMode='ep4';IN=null;ps=[];shake=0;state='levels';startRun()}
+function startIntro(kind){kind=kind||'oak';voiceStop();state='cut';csMode='intro';const K=kind==='coco'||kind==='cmid'||kind==='cend';LV=kind==='coco'?11:kind==='cmid'?15:kind==='cend'?20:kind==='fin'?10:1;applyLevel(LV);const IP={x:300,y:370,w:1500,f:false,dx:0,dy:0,tf:K?1:0};mkPlat(IP);plats=[IP];pads=[];HAZ=[];BR=[];flies=[];foes=[];hpick=[];pots=[];bossReset();boss.on=false;ps=[];nuts=[];waves=[];sup=[];quake=[];camX=450;camV=0;shake=0;msg={s:'',l:0};
+  IN={i:0,f:0,T:0,trk:'game',dark:0,dk:0,fl:0,shk:0,fade:1,cap:null,ok:{x:480,y:0,pose:'walk',face:1},td:{x:1800,y:0,vis:0,pose:'idle',flip:1,a:1},ld:{x:2000,y:0,vis:0,pose:'idle',flip:1,a:1},br:{x:380,y:0,vis:0,pose:'idle',held:0},kind,ball:{x:380,vis:0,ang:0},co:{x:650,y:0,pose:'idle',vis:0},cr:{x:1900,y:0,vis:0,flip:1,a:1},st:{x:1180,y:0,vis:0,held:0,a:1},pot:{vis:0,x:720,y:-120},pa:{x:1750,y:0,vis:0,a:1},mu:{x:480,y:0,vis:0,pose:'idle'}};IN.steps=kind==='coco'?mkIntroC():kind==='cmid'?mkMid():kind==='cend'?mkEnd():kind==='fin'?mkFin():mkIntro()}
+function endIntro(){voiceStop();if(IN&&IN.kind==='fin'){LS.s('gw_fin','1');csMode='ep4';IN=null;ps=[];shake=0;state='levels';SELLV=10;drawLvs();const ok=potCount()>=POT_NEED[1];$('lnote').textContent=ok?'Coco is unlocked! Pick him on the hero screen.':lvNote();toast(ok?'New hero unlocked: Coco the Coconut!':'Collect all 30 potions to unlock Coco ('+potCount()+'/30)');return}if(IN&&(IN.kind==='cmid'||IN.kind==='cend')){const E=IN.kind==='cend';LS.s(E?'gw_cend':'gw_cmid','1');csMode='ep4';IN=null;ps=[];shake=0;state='levels';SELLV=E?20:15;drawLvs();$('lnote').textContent=E?"Coco's story is complete! A new hero is on the way...":lvNote();if(E)toast("Coco's story is complete!  A new hero is on the way...");return}if(IN&&IN.kind==='coco'){LS.s('gw_introc','1');INTROC_SEEN=true}else{LS.s('gw_intro','1');INTRO_SEEN=true}csMode='ep4';IN=null;ps=[];shake=0;state='levels';startRun()}
 
 // ---------- Oakie finale (after Level 10) ----------
 function mkFin(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*Math.PI))*26:0};
@@ -606,11 +606,46 @@ function mkIntroC(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*
   {min:140,say:['crab','Catch me if you can, little nut! Ha ha ha!'],u:f=>{const a=I(),cr=a.cr,st=a.st;cr.flip=-1;if(f>10)cr.x+=6.2;st.x=cr.x+62;st.y=-62+Math.sin(f/5)*3;if(cr.x>1560){cr.a=Math.max(0,cr.a-.06);st.a=cr.a;if(f%4===0)burst(cr.x-camX,330,'#ff8a6a',4,3)}if(f===40)sfx('thunder');a.co.pose='walk';if(a.co.x<1000)a.co.x+=2}},
   {trk:'sad',min:170,say:['narr','Without the Tide Stone, the waves went wild... and swept Coco\'s mum far out to sea. Now Coco must roll across the island, and bring her home!'],u:f=>{const a=I();a.dk=.2;a.cr.vis=0;a.st.vis=0;a.co.pose='idle'}},
   {trk:'game',min:150,say:['narr','Roll, Coco, roll!'],u:f=>{const a=I();a.dk=0;a.co.pose=f<20?'idle':'walk';if(f>20)a.co.x+=2.2;if(f===20)sfx('jump')},last:1}]}
+
+// ---------- Coco: mid story (after Level 14) and ending (after Level 20) ----------
+function mkMid(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*Math.PI))*26:0};
+  return[
+  {trk:'game',min:90,say:['narr','Wave after wave crashed across the sea, but Coco kept rolling. Nothing could slow him down.'],u:f=>{const a=I();a.co.vis=1;if(f===0){a.co.x=700;a.co.pose='walk'}if(a.co.x<900)a.co.x+=3;else a.co.pose='idle'}},
+  {min:70,say:['coco','Hang on, Mum! I am coming for you!'],u:f=>{const a=I();a.co.pose='idle';hop(a.co,f,30)}},
+  {trk:'tense',min:120,say:['crab','Ha ha ha! Not bad, little nut. But my ship waits at the end of the sea, and nobody beats Captain Crabbage!'],u:f=>{const a=I();if(f===1){sfx('thunder');a.fl=.9}a.dk=.4;a.shk=f<40?5:0;a.cr.vis=1;a.cr.a=1;a.cr.flip=1;a.cr.x=Math.max(1380,a.cr.x-10)}},
+  {min:110,say:['crab','Your mum is on board. So is the Tide Stone. Come and get them, if you dare! Pinch, pinch!'],u:f=>{const a=I();a.cr.vis=1}},
+  {min:90,say:['coco','Then I will! Nothing will stop me now!'],u:f=>{const a=I(),cr=a.cr;a.co.pose=f<24?'jump':'idle';hop(a.co,f,24);cr.flip=-1;if(f>20)cr.x+=7;if(cr.x>1560){cr.a=Math.max(0,cr.a-.07)}}},
+  {trk:'game',min:150,say:['narr','And so Coco rolled on, past the glowing lagoon, towards the pirate waters beyond.'],u:f=>{const a=I();a.dk=0;a.cr.vis=0;a.co.pose=f<20?'idle':'walk';if(f>20)a.co.x+=2.4},last:1}]}
+function mkEnd(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*Math.PI))*26:0};
+  return[
+  {trk:'tense',min:110,say:['narr','Captain Crabbage\'s ship cracked and crumbled into the sea... and the Tide Stone came tumbling out of the wreckage.'],u:f=>{const a=I();if(f===0){a.co.vis=1;a.co.x=900;a.co.pose='idle';a.cr.vis=1;a.cr.a=1;a.cr.x=1400;a.cr.pose='down';a.cr.flip=-1;a.st.vis=1;a.st.held=1;a.st.x=1150;a.fl=.8;sfx('thunder')}a.shk=f<50?6:0;a.st.y=-70+Math.sin(f/9)*6;if(f>60)a.cr.a=Math.max(0,a.cr.a-.03)}},
+  {trk:'game',min:80,say:['coco','The Tide Stone! I did it!'],u:f=>{const a=I();a.dk=0;a.cr.vis=0;a.co.pose='idle';if(f===0){sfx('charged');a.fl=.7}hop(a.co,f,30);a.st.x=Math.min(a.co.x+10,a.st.x+(a.co.x-a.st.x)*.04);a.st.y=-70+Math.sin(f/9)*6}},
+  {min:100,say:['narr','The moment Coco held it high, the waves turned calm, and the whole sea sparkled.'],u:f=>{const a=I();if(f===0){applyLevel(11);const IP={x:300,y:370,w:1500,f:false,dx:0,dy:0,tf:1};mkPlat(IP);plats=[IP];pads=[];HAZ=[];BR=[];a.fl=1;a.shk=0}a.st.x=a.co.x;a.st.y=-150+Math.sin(f/10)*6;if(f%8===0)burst(a.st.x-camX,300,'#8fe3ff',6,4);a.co.pose='idle'}},
+  {min:90,say:['mum','Coco! My brave little coconut!'],u:f=>{const a=I(),m=a.mu;m.vis=1;a.st.y=-150+Math.sin(f/10)*6;a.st.x=a.co.x;if(f===0){m.x=480;sfx('charged')}if(m.x<720){m.x+=3;m.pose='walk'}else m.pose='idle'}},
+  {min:100,say:['coco','Mum! You are safe! I knew I would find you!'],u:f=>{const a=I();a.st.y=-150+Math.sin(f/10)*6;a.mu.pose='idle';hop(a.co,f,30);if(f>12)hop(a.mu,f-12,30)}},
+  {min:110,say:['narr','Mum was safe, the island was at peace, and the Tide Stone shone bright once more.'],u:f=>{const a=I();a.st.y=-150+Math.sin(f/10)*6;a.co.pose='idle';a.mu.pose='idle'}},
+  {trk:'sad',min:130,say:['narr','But far across the horizon, a big, round shadow was drifting closer, humming a sleepy little tune...'],u:f=>{const a=I();a.dk=.4;a.st.vis=0;a.pa.vis=1;if(a.pa.x>1480)a.pa.x-=2.2}},
+  {min:130,say:['panda','Umm... excuse me? Is there any bamboo around here? I am sooo hungry...'],u:f=>{const a=I();a.dk=.4;if(a.pa.x>1440)a.pa.x-=1}},
+  {min:90,say:['coco','Whoa! Who is that?'],u:f=>{const a=I();a.co.pose='jump';hop(a.co,f%48,24)}},
+  {trk:'game',min:230,last:1,u:f=>{const a=I();a.dk=.25;a.co.pose='idle'}}]}
+function drawPandaSil(x,y,sc,T){g.save();g.translate(x,y);g.scale(sc,sc);const bob=Math.sin(T/20)*2;g.translate(0,bob);
+  const sil='#0b0e1c',rim='#6fa8ff';g.fillStyle=sil;g.strokeStyle=rim+'66';g.lineWidth=3;
+  const blob=(cx,cy,rx,ry)=>{g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill();g.stroke()};
+  blob(-34,-8,16,12);blob(34,-8,16,12);blob(-26,-4,20,16);blob(26,-4,20,16);
+  blob(0,-52,66,56);blob(-30,-10,19,14);blob(30,-10,19,14);
+  blob(-52,-118,18,18);blob(52,-118,18,18);blob(0,-104,54,46);
+  g.fillStyle='#ffffff';g.shadowColor='#bfe3ff';g.shadowBlur=14;[[-19,-102],[19,-102]].forEach(e=>{g.beginPath();g.ellipse(e[0],e[1],7.5,9,0,0,7);g.fill()});g.shadowBlur=0;g.fillStyle=sil;[[-19,-100],[19,-100]].forEach(e=>{g.beginPath();g.arc(e[0]+1,e[1],3.6,0,7);g.fill()});g.fillStyle='#fff';[[-17,-103],[21,-103]].forEach(e=>{g.beginPath();g.arc(e[0],e[1],1.5,0,7);g.fill()});
+  g.fillStyle=sil;g.beginPath();g.ellipse(0,-90,6,4.5,0,0,7);g.fill();g.restore()}
+let MUMI={};
+function mumImg(k){if(MUMI[k])return MUMI[k];const nm={idle:'ci',walk:'cra',walkB:'crb',cheer:'cc'}[k],o=IM[nm];const c=recolorC(o,nm,null,[215,1,1.12],null,1);c.dh=o.dh;c.ax=o.ax;return MUMI[k]=c}
+function drawIntroExtrasC(){const a=IN,gy=372,T=a.T,m=a.mu,pa=a.pa;
+  if(m.vis){const k=m.pose==='walk'?(Math.floor(T/7)%2?'walk':'walkB'):'idle',im=mumImg(k),bob=m.pose==='walk'?Math.abs(Math.sin(T/7*Math.PI))*-3:Math.sin(T/18)*-1.2;shadow(m.x,gy,40,1);sp(im,m.x-camX,gy+m.y+bob+2,(im.dh||110)*1.28,1,1,1,im.ax==null?.5:im.ax)}
+  if(pa.vis&&pa.a>0){shadow(pa.x,gy,60,.6);drawPandaSil(pa.x-camX,gy+4,.95,T)}}
 function drawIntroActorsC(){const a=IN,gy=372,T=a.T,co=a.co,cr=a.cr,st=a.st,ba=a.ball;
   if(st.vis&&st.a>0){const x=st.x-camX,y=gy-(st.held?0:46)+st.y;g.save();g.globalAlpha=st.a;if(!st.held){g.fillStyle='#6a6a78';g.beginPath();g.ellipse(x,gy-4,34,14,0,0,7);g.fill()}
     g.globalCompositeOperation='lighter';const r=g.createRadialGradient(x,y-26,2,x,y-26,50);r.addColorStop(0,'#7ff3ffcc');r.addColorStop(1,'#7ff3ff00');g.fillStyle=r;g.fillRect(x-50,y-76,100,100);g.globalCompositeOperation='source-over';
     g.fillStyle='#8fe8ff';g.strokeStyle='#1b7aa8';g.lineWidth=4;g.beginPath();g.arc(x,y-26,18,0,7);g.fill();g.stroke();g.fillStyle='#fff';g.beginPath();g.arc(x-6,y-32,5,0,7);g.fill();g.restore()}
-  if(cr.vis&&cr.a>0){const im=CRB.idle;g.save();g.globalAlpha=cr.a;shadow(cr.x,gy,70,cr.a);sp(im,cr.x-camX,gy+2+Math.abs(Math.sin(T/6))*-4*(Math.abs(cr.x-1330)>2?1:0),(im.dh||im.height*.7),cr.flip,1,1,.5);g.restore()}
+  if(cr.vis&&cr.a>0){const im=(cr.pose==='down'&&CRB.down)?CRB.down:CRB.idle;g.save();g.globalAlpha=cr.a;shadow(cr.x,gy,70,cr.a);sp(im,cr.x-camX,gy+2+Math.abs(Math.sin(T/6))*-4*(Math.abs(cr.x-1330)>2?1:0),(im.dh||im.height*.7),cr.flip,1,1,.5);g.restore()}
   if(ba.vis)drawRoll(ba.x-camX,gy-27,28,ba.ang);
   if(co.vis){const k=co.pose;let im=CO.idle,bob=Math.sin(T/18)*-1.2;if(k==='walk'){im=(Math.floor(T/7)%2)?CO.runA:CO.runB;bob=Math.abs(Math.sin(T/7*Math.PI))*-3}else if(k==='jump'){im=CO.jump;bob=0}shadow(co.x,gy,30,1);spo(im,co.x-camX,gy+co.y+bob+2,1,1,1)}}
 function mkIntro(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*Math.PI))*26:0};
@@ -635,14 +670,14 @@ function mkIntro(){const I=()=>IN,hop=(o,f,n)=>{o.y=f<n?-Math.abs(Math.sin(f/n*M
   {trk:'sad',min:100,say:['oak','No! Little brother! Wait for me!'],u:f=>{const a=I(),ok=a.ok;a.dk=.3;a.td.vis=a.ld.vis=a.br.vis=0;if(ok.x<980){ok.x+=3.2;ok.pose='walk';if(f%24===0)sfx('stomp')}else ok.pose='idle'}},
   {min:170,say:['narr','The villains vanished, and took Oakie\'s little brother with them. Now Oakie must run through the forest... and save him!'],u:f=>{const a=I();a.dk=.12;a.ok.pose='idle'}},
   {trk:'game',min:150,say:['narr','Run, Oakie, run!'],u:f=>{const a=I();a.dk=0;a.ok.pose=f<20?'idle':'walk';if(f>20)a.ok.x+=2.2;if(f===20)sfx('jump')},last:1}]}
-function introUpdate(){const S=IN.steps[IN.i];if(!S){endIntro();return}if(IN.kind==='fin'&&IN.T<3){camX=450;camV=0}
+function introUpdate(){const S=IN.steps[IN.i];if(!S){endIntro();return}if((IN.kind==='fin'||IN.kind==='cmid'||IN.kind==='cend')&&IN.T<3){camX=450;camV=0}
   if(IN.f===0){if(S.trk)IN.trk=S.trk;S.m=Math.max(S.min,S.say?S.say[1].length*4.2:0);if(S.say){say(S.say[0],S.say[1]);IN.cap={who:S.say[0],text:S.say[1],f:0}}}
   IN.T++;S.u&&S.u(IN.f,IN);IN.f++;if(IN.cap)IN.cap.f++;
   IN.dark+=(IN.dk-IN.dark)*.04;if(IN.fl>0)IN.fl-=.04;if(IN.shk>0)IN.shk-=.4;shake=IN.shk;
   IN.fade=IN.T<40?1-IN.T/40:(S.last&&IN.f>S.m-45?Math.min(1,(IN.f-(S.m-45))/45):0);
   ps.forEach(a=>{a.x+=a.vx;a.y+=a.vy;a.vy+=.08;a.l--});ps=ps.filter(a=>a.l>0);
   if(IN.f>=S.m&&!voiceBusy()||IN.f>S.m+900){IN.i++;IN.f=0}}
-function drawIntroActors(){if(IN.kind==='coco')return drawIntroActorsC();const a=IN,gy=372,T=a.T;
+function drawIntroActors(){if(IN.kind==='coco')return drawIntroActorsC();if(IN.kind==='cmid'||IN.kind==='cend'){drawIntroActorsC();return drawIntroExtrasC()}const a=IN,gy=372,T=a.T;
   const ld=a.ld,td=a.td,ok=a.ok,br=a.br;
   if(ld.vis&&(ld.a==null||ld.a>0)){const im=IM.vIdle;g.save();g.globalAlpha=ld.a;shadow(ld.x,gy,70,ld.a);sp(im,ld.x-camX,gy+ld.y-8,im.height*.68,ld.flip,1,1,.5);g.restore()}
   if(td.vis&&td.a>0){const im=td.pose==='jump'?IM.bossJump:IM.bossIdle;g.save();g.globalAlpha=td.a;shadow(td.x,gy,70,td.a);sp(im,td.x-camX,gy+td.y+2,im.height*BF,td.flip,1,1+(td.pose==='idle'?Math.sin(T/14)*.012:0),.5);g.restore()}
@@ -657,7 +692,7 @@ function drawIntroFX(){const a=IN;if(a.dark>.01){g.fillStyle='rgba(20,6,40,'+a.d
     g.font='700 20px Fredoka,sans-serif';g.fillStyle=v.c;g.fillText(v.n,W/2,82);g.font='600 25px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=5;g.strokeStyle='#1a0a2a';
     const words=txt.split(' ');let l1='',l2='';for(const w of words){if((l1+' '+w).length<56&&!l2)l1=(l1?l1+' ':'')+w;else l2=(l2?l2+' ':'')+w}
     if(l2){g.font='600 21px Fredoka,sans-serif';g.strokeText(l1,W/2,106);g.fillStyle='#fff3cf';g.fillText(l1,W/2,106);g.strokeText(l2,W/2,128);g.fillText(l2,W/2,128)}else{g.strokeText(l1,W/2,114);g.fillStyle='#fff3cf';g.fillText(l1,W/2,114)}g.restore()}
-  if(a.i===a.steps.length-1){const k=Math.min(1,a.f/30)*(1-a.fade);g.save();g.globalAlpha=k;g.textAlign='center';g.lineJoin='round';g.font='700 92px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=13;g.strokeStyle='#3a1a0a';const FN=a.kind==='fin',T1=FN?'NEW HERO!':'LEVEL '+LN(LV),T2=FN?(potCount()>=POT_NEED[1]?'Coco the Coconut joins the adventure':'Find all 30 potions to unlock Coco'):NMG[LV-1];g.strokeText(T1,W/2,H/2+10);g.fillStyle='#ffd23f';g.fillText(T1,W/2,H/2+10);g.font='600 32px Fredoka,sans-serif';g.fillStyle='#fff3cf';g.fillText(T2,W/2,H/2+56);g.restore()}
+  if(a.i===a.steps.length-1){const k=Math.min(1,a.f/30)*(1-a.fade);g.save();g.globalAlpha=k;g.textAlign='center';g.lineJoin='round';g.font='700 92px Fredoka,"Trebuchet MS",sans-serif';g.lineWidth=13;g.strokeStyle='#3a1a0a';const FN=a.kind==='fin',CE=a.kind==='cend',T1=FN||CE?(CE?'NEXT HERO':'NEW HERO!'):'LEVEL '+LN(LV),T2=CE?'A cute little panda is on his way...':FN?(potCount()>=POT_NEED[1]?'Coco the Coconut joins the adventure':'Find all 30 potions to unlock Coco'):NMG[LV-1];g.strokeText(T1,W/2,H/2+10);g.fillStyle='#ffd23f';g.fillText(T1,W/2,H/2+10);g.font='600 32px Fredoka,sans-serif';g.fillStyle='#fff3cf';g.fillText(T2,W/2,H/2+56);g.restore()}
   if(a.fade>0){g.fillStyle='rgba(0,0,0,'+a.fade+')';g.fillRect(0,0,W,H)}
   g.save();g.font='500 16px Fredoka,sans-serif';g.textAlign='right';g.fillStyle='#ffffffaa';g.fillText('',W-24,H-14);g.restore()}
 // ---------- story cutscene after level 4 ----------
@@ -1039,12 +1074,11 @@ let bootDone=false,bootT=[];
 function bootEnd(){if(bootDone)return;bootDone=true;bootT.forEach(clearTimeout);const b=$('boot');b.classList.add('out');setTimeout(()=>{b.classList.remove('on')},1000)}
 function bootRun(){const b1=$('b1'),b2=$('b2'),at=(ms,f)=>bootT.push(setTimeout(f,ms));
   bootSfx('logo');at(60,()=>b1.classList.add('show'));
-  at(6200,()=>b1.classList.remove('show'));
-  at(7300,()=>{bootSfx('msg');b2.classList.add('show');const p=$('bprog');p.style.transition='width 10s linear';p.style.width='100%'});
-  at(17600,()=>{bootSfx('out');b2.classList.remove('show')});at(18400,bootEnd);
-  $('bGo').onclick=()=>{bootT.forEach(clearTimeout);bootSfx('out');b2.classList.remove('show');setTimeout(bootEnd,500)};
-  $('bDon').onclick=()=>{bootT.forEach(clearTimeout);$('bprog').style.transition='none';donateGo()};
-  b1.addEventListener('pointerdown',()=>{if(b2.classList.contains('show'))return;bootT.forEach(clearTimeout);b1.classList.remove('show');at(700,()=>{bootSfx('msg');b2.classList.add('show');const p=$('bprog');p.style.transition='width 10s linear';p.style.width='100%'});at(10800,()=>{b2.classList.remove('show')});at(11600,bootEnd)},{once:true})}
+  at(4800,()=>b1.classList.remove('show'));
+  at(5800,()=>{bootSfx('msg');b2.classList.add('show');const p=$('bprog');p.style.transition='width 6.5s linear';p.style.width='100%'});
+  at(12300,()=>{bootSfx('out');b2.classList.remove('show')});at(13100,bootEnd);
+  b2.addEventListener('pointerdown',()=>{if(!b2.classList.contains('show'))return;bootT.forEach(clearTimeout);bootSfx('out');b2.classList.remove('show');setTimeout(bootEnd,600)});
+  b1.addEventListener('pointerdown',()=>{if(b2.classList.contains('show'))return;bootT.forEach(clearTimeout);b1.classList.remove('show');at(700,()=>{bootSfx('msg');b2.classList.add('show');const p=$('bprog');p.style.transition='width 6.5s linear';p.style.width='100%'});at(7600,()=>{b2.classList.remove('show')});at(8400,bootEnd)},{once:true})}
 function bootStart(){const b=$('boot');b.classList.add('on');const portrait=()=>matchMedia('(pointer:coarse) and (orientation:portrait)').matches;
   const go=()=>{if(portrait()){setTimeout(go,300);return}try{auInit&&!AU.ctx&&auInit()}catch(e){}
     const run=()=>{$('bgate').style.display='none';bootRun()};
@@ -1122,7 +1156,7 @@ function showLevels(){if(state!=='select')return;sfx('click');state='levels';fix
 function startRun(){if(state!=='levels')return;if(!window.NOINTRO){if(SELLV===1&&!INTRO_SEEN){startIntro('oak');return}if(SELLV===11&&!INTROC_SEEN){startIntro('coco');return}}sfx('click');RUNCOL=emptyCol();RUNPOT={};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
 function toTitle(){state='title';tr.on=false;RUNCOL=emptyCol();RUNPOT={}}
 function bankLevel(how){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(how,score)}
-function endRun(s){if(state!=='play')return;state=s;if(s==='win'){if(LV<=10){MAXLV=Math.min(10,Math.max(MAXLV,LV+1));LS.s('gw_maxlv',MAXLV)}else{MAXC=Math.min(20,Math.max(MAXC,LV+1));LS.s('gw_maxc',MAXC)}bankLevel('win');if(LV===4){startCut();return}if(LV===10&&finPot){finPot=false;startIntro('fin');return}}else{if(!(s==='over'&&boss.on)){RUNCOL=emptyCol();RUNPOT={}}cloudSave(s,0)}}
+function endRun(s){if(state!=='play')return;state=s;if(s==='win'){if(LV<=10){MAXLV=Math.min(10,Math.max(MAXLV,LV+1));LS.s('gw_maxlv',MAXLV)}else{MAXC=Math.min(20,Math.max(MAXC,LV+1));LS.s('gw_maxc',MAXC)}bankLevel('win');if(LV===4){startCut();return}if(LV===14&&!LS.g('gw_cmid')){startIntro('cmid');return}if(LV===20&&!LS.g('gw_cend')){startIntro('cend');return}if(LV===10&&finPot){finPot=false;startIntro('fin');return}}else{if(!(s==='over'&&boss.on)){RUNCOL=emptyCol();RUNPOT={}}cloudSave(s,0)}}
 const LOCK='<svg viewBox="0 0 64 64"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#dfe6ee" stroke-width="6" stroke-linecap="round"/><rect x="12" y="28" width="40" height="28" rx="8" fill="#e9b949" stroke="#7a4a0a" stroke-width="3"/><circle cx="32" cy="41" r="4" fill="#7a4a0a"/></svg>';
 const HEROES=[{n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]]},{n:'Coco',role:'The Cool Coconut',st:[['Speed',.55],['Jump',.6],['Luck',.85]]}].concat(Array(13).fill(0));
 function showHero(i){const h=HEROES[i];$('pName').textContent=h.n;$('pRole').textContent=h.role;$('bars').innerHTML=h.st.map(a=>`<div class="bar"><span>${a[0]}</span><i><b style="width:${a[1]*100}%"></b></i></div>`).join('');document.querySelectorAll('.tile').forEach((t,k)=>t.classList.toggle('on',k===i));heroImgs(i)}
