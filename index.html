@@ -1187,7 +1187,7 @@ function draw(){
   if(state==='win')banner(BN[LV]+' defeated!',['Level '+LN(LV)+' cleared!  +'+score+' coins banked (total '+wallet+')'+'  ·  Potions '+potCount()+'/'+POT_ALL,(LV%10?'Level '+LN(LV+1)+' unlocked!   ':'')+'Press Space or tap to choose a level']);
 }
 let last=performance.now(),acc=0;
-function loop(n){qWatch(n-last);if(skipAsk&&state!=='cut'){skipAsk=false;$('skipQ').classList.remove('on')}if(state==='play'&&PORTRAIT.matches)state='pause';acc+=Math.min(34,n-last);last=n;while(acc>=16.67){if(state==='play')update();else{t++;if(state==='trans')transUpdate();if(state==='cut'&&!skipAsk)cutUpdate()}acc-=16.67}if(isMenu())camX=(L-VW)*(.5+.5*Math.sin(t/420));syncUI();syncPad();duck();if(AU.ctx&&AU.ctx.state==='running')setTrack(isMenu()?'menu':state==='cut'?cutTrack():(state!=='trans'&&boss&&boss.on&&boss.st!=='defeated'?'boss':'game'));draw();requestAnimationFrame(loop)}
+function loop(n){qWatch(n-last);if(skipAsk&&state!=='cut'){skipAsk=false;$('skipQ').classList.remove('on')}if(state==='play'&&PORTRAIT.matches)state='pause';acc+=Math.min(34,n-last);last=n;while(acc>=16.67){if(state==='play')update();else{t++;if(state==='trans')transUpdate();if(state==='cut'&&!skipAsk)cutUpdate()}acc-=16.67}if(isMenu())camX=(L-VW)*(.5+.5*Math.sin(t/420));syncUI();syncPad();duck();if(AU.ctx&&AU.ctx.state==='running'&&!bootDone){if(AU.name){stopTrack();AU.name=null}}else if(AU.ctx&&AU.ctx.state==='running')setTrack(isMenu()?'menu':state==='cut'?cutTrack():(state!=='trans'&&boss&&boss.on&&boss.st!=='defeated'?'boss':'game'));draw();requestAnimationFrame(loop)}
 // ===== UI + AUDIO =====
 let wallet=0;try{wallet=+localStorage.getItem('gw_coins')||0}catch(e){}
 const $=id=>document.getElementById(id);
@@ -1292,7 +1292,7 @@ function hvStart(){if(!hv.bound){hv.bound=1;$('heroCv').addEventListener('pointe
   const S=$('select');S.querySelectorAll('.spk').forEach(e=>e.remove());for(let i=0;i<7;i++){const e=document.createElement('div');e.className='spk';e.textContent=i%2?'★':'✦';e.style.cssText='left:'+(6+i*13)+'%;bottom:'+(4+(i*7)%18)+'em;font-size:'+(1.2+(i%3)*.5)+'em;animation-delay:'+(-i*.7)+'s';S.appendChild(e)}
   if(!hv.raf)hv.raf=requestAnimationFrame(hvFrame)}
 
-function showSelect(){if(state!=='title')return;if(!AUTH.user){AUTH.next=null;sfx('click');openAuth();return}state='select';sfx('click');fixSel();drawSlots();showHero(heroOpen(HERO)?HERO:0);hvStart()}
+function showSelect(){if(state!=='title')return;if(!AUTH.user){AUTH.next=null;sfx('click');openAuth();return}if(!navigator.onLine)toast('Offline - your progress will be saved to your account when you are back online');state='select';sfx('click');fixSel();drawSlots();showHero(heroOpen(HERO)?HERO:0);hvStart()}
 const MSAY=[['Hi friend!','wave'],['Wheee!','spin'],['Boing boing!','hop'],['Ready to run?','wave'],['So dizzy...','dizzy'],['Squish!','squash'],['Let\'s go!','hop'],['Catch the potions!','wave']];
 let masT=0;
 function masGag(g,t){const m=$('mas');if(!m)return;m.classList.remove('wave','spin','hop','dizzy','squash','say');void m.offsetWidth;m.classList.add(g,'say');$('masB').textContent=t;clearTimeout(masGag.t);masGag.t=setTimeout(()=>m.classList.remove(g,'say'),2400)}
@@ -1518,8 +1518,8 @@ function applySkin(){
     $('h1').src=u('runAb');$('h2').src=u('runBb');$('sHero').src=u('idleBig');
     document.querySelectorAll('#slots .face[data-i="0"]').forEach(e=>e.src=u('idle'));if(PVC)heroImgs(1);document.querySelectorAll('#schars .face').forEach(e=>e.src=u('idle'))}catch(e){}
   applySkinC();applySkinB()}
-function saveInv(){LS.s('gw_inv',JSON.stringify(INV));LS.s('gw_coins',wallet);
-  if(DB&&CSYNC){try{DB.collection('users').doc(CSYNC).set({coins:wallet,inv:INV,lastPlayed:FV().serverTimestamp()},{merge:true}).catch(()=>{})}catch(e){}}}
+function saveInv(){LS.s('gw_inv',JSON.stringify(INV));LS.s('gw_coins',wallet);LS.s('gw_dirty','1');
+  if(DB&&CSYNC){try{DB.collection('users').doc(CSYNC).set({coins:wallet,inv:INV,lastPlayed:FV().serverTimestamp()},{merge:true}).then(()=>{LS.s('gw_dirty','0')}).catch(()=>{})}catch(e){}}}
 // ---- store screen ----
 let SS={cat:'cap',sel:null,prev:{}};const THUMB={};
 const CROP={cap:[100,0,300,176],out:[90,190,310,150],sh:[150,372,260,68]};
@@ -1599,23 +1599,33 @@ async function cloudLogin(){
   const ref=DB.collection('users').doc(u.uid);
   try{
     const sn=await ref.get();
-    if(sn.exists){const d=sn.data();wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;COL=normCol(d.collected);POTS=normPots(d.pots);INV=normInv(d.inv);LS.s('gw_inv',JSON.stringify(INV));
+    if(sn.exists){const d=sn.data(),dirty=LS.g('gw_dirty')==='1'&&LS.g('gw_uid')===u.uid;
+      if(dirty){const cc=normCol(d.collected),cp=normPots(d.pots),ci=normInv(d.inv);
+        for(const n of LVS){COL[n]=[...new Set([...(COL[n]||[]),...(cc[n]||[])])].sort((a,b)=>a-b);for(let i=0;i<3;i++)POTS[n][i]=(POTS[n][i]||cp[n][i])?1:0}
+        MAXLV=Math.max(MAXLV,+d.maxLevel||1);MAXC=Math.max(MAXC,+d.maxC||11);MAXP=Math.max(MAXP,+d.maxP||21);BEST=Math.max(BEST,+d.bestScore||0);
+        for(const ch of STORE_CHARS)INV[ch.id].own=[...new Set([...(INV[ch.id].own||[]),...ci[ch.id].own])];
+        LS.s('gw_inv',JSON.stringify(INV))}
+      else{wallet=+d.coins||0;BEST=+d.bestScore||0;MAXLV=+d.maxLevel||1;MAXC=Math.max(11,+d.maxC||11);MAXP=Math.max(21,+d.maxP||21);COL=normCol(d.collected);POTS=normPots(d.pots);INV=normInv(d.inv);LS.s('gw_inv',JSON.stringify(INV))}
       await ref.set({name:AUTH.user.name,email:u.email,lastLogin:FV().serverTimestamp(),loginCount:FV().increment(1)},{merge:true})}
-    else{wallet=0;BEST=0;MAXLV=1;COL=emptyCol();POTS=emptyPots();INV=defInv();
+    else{wallet=0;BEST=0;MAXLV=1;MAXC=11;MAXP=21;COL=emptyCol();POTS=emptyPots();INV=defInv();
       await ref.set({name:AUTH.user.name,email:u.email,createdAt:FV().serverTimestamp(),lastLogin:FV().serverTimestamp(),loginCount:1,coins:0,bestScore:0,runs:0,wins:0,maxLevel:1,hero:0,collected:emptyCol(),inv:INV})}
-    LS.s('gw_coins',wallet);LS.s('gw_col',JSON.stringify(COL));LS.s('gw_pot',JSON.stringify(POTS));LS.s('gw_maxlv',MAXLV);RUNCOL=emptyCol();RUNPOT={};fixSel();try{setWal()}catch(e){}drawLvs();applySkin();
+    LS.s('gw_uid',u.uid);LS.s('gw_coins',wallet);LS.s('gw_col',JSON.stringify(COL));LS.s('gw_pot',JSON.stringify(POTS));LS.s('gw_maxlv',MAXLV);LS.s('gw_maxc',MAXC);LS.s('gw_maxp',MAXP);RUNCOL=emptyCol();RUNPOT={};fixSel();try{setWal()}catch(e){}drawLvs();applySkin();
+    if(LS.g('gw_dirty')==='1')cloudSave('sync',0)
   }catch(e){CSYNC=null}
 }
 function cloudSave(how,sc){
+  LS.s('gw_dirty','1');
   if(!DB||!CSYNC)return;
   try{
     const d={coins:wallet,lastPlayed:FV().serverTimestamp(),runs:FV().increment(how==='level'?0:1)};
     if(sc>BEST){BEST=sc;d.bestScore=BEST}
-    d.maxLevel=MAXLV;d.collected=COL;d.pots=POTS;
+    d.maxLevel=MAXLV;d.maxC=MAXC;d.maxP=MAXP;d.hero=HERO;d.collected=COL;d.pots=POTS;d.inv=INV;
     if(how==='win')d.wins=FV().increment(1);
-    DB.collection('users').doc(CSYNC).set(d,{merge:true}).catch(()=>{});
+    DB.collection('users').doc(CSYNC).set(d,{merge:true}).then(()=>{LS.s('gw_dirty','0')}).catch(()=>{});
   }catch(e){}
 }
+function cloudSync(){if(DB&&CSYNC&&LS.g('gw_dirty')==='1')cloudSave('sync',0)}
+addEventListener('online',()=>setTimeout(cloudSync,800));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cloudSync()});setInterval(cloudSync,60000);
 const BE={
   async signup(n,m,p){if(FB){const c=await FB.auth().createUserWithEmailAndPassword(m,p);await c.user.updateProfile({displayName:n});return{name:n,email:m}}
     const a=accs();if(a[m])throw{code:'auth/email-already-in-use'};a[m]={name:n,h:await hashPw(p)};LS.s('gw_acc',JSON.stringify(a));return{name:n,email:m}},
@@ -1625,7 +1635,7 @@ const BE={
   async out(){if(FB)try{await FB.auth().signOut()}catch(e){}}
 };
 const ERR={'auth/email-already-in-use':'That email already has an account. Please sign in.','auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs at least 6 characters.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No internet connection.','local/noreset':'Reset emails need the online setup. Not switched on yet.'};
-function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');LS.d('gw_col');LS.d('gw_pot');LS.d('gw_maxlv');LS.d('gw_inv');INV=defInv();try{applySkin()}catch(e){}wallet=0;BEST=0;MAXLV=1;COL=emptyCol();POTS=emptyPots();RUNCOL=emptyCol();RUNPOT={};SELLV=1;CSYNC=null}drawWho()}
+function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');LS.d('gw_col');LS.d('gw_pot');LS.d('gw_maxlv');LS.d('gw_inv');LS.d('gw_maxc');LS.d('gw_maxp');LS.d('gw_dirty');LS.d('gw_uid');MAXC=11;MAXP=21;INV=defInv();try{applySkin()}catch(e){}wallet=0;BEST=0;MAXLV=1;COL=emptyCol();POTS=emptyPots();RUNCOL=emptyCol();RUNPOT={};SELLV=1;CSYNC=null}drawWho()}
 function drawWho(){const w=$('who');if(!w)return;const show=AUTH.user&&(state==='title'||state==='select');w.style.display=show?'block':'none';if(show)w.innerHTML='&#128100; '+AUTH.user.name.replace(/[<>&]/g,'')+'<small>logged in</small>'}
 function aMsg(t,ok){const m=$('aMsg');m.textContent=t||'';m.className=ok?'ok':''}
 function aShake(){const c=$('acard');c.classList.remove('shk');void c.offsetWidth;c.classList.add('shk');sfx('nope')}
@@ -1636,9 +1646,13 @@ function aMode(m){AUTH.mode=m;const up=m==='up',rs=m==='reset';
   $('aGo').textContent=up?'Create account':rs?'Send reset link':'Sign in';
   $('aForgot').textContent=rs?'Back to sign in':'Forgot password?';$('aForgot').style.display=up?'none':'';
   $('tIn').innerHTML=LS.g('gw_has')==='1'?'Sign in':'&#128274; Sign in';$('tIn').classList.toggle('lk',LS.g('gw_has')!=='1');aMsg('')}
-function openAuth(){if(!AUTH.next)AUTH.next=null;aMode(LS.g('gw_has')==='1'?'in':'up');$('auth').classList.remove('hide')}
+function openAuth(){if(!AUTH.next)AUTH.next=null;aMode(LS.g('gw_has')==='1'?'in':'up');$('auth').classList.remove('hide');{const bl=authBlock();if(bl)aMsg(bl)}}
+addEventListener('online',()=>{try{if(!$('auth').classList.contains('hide')&&$('aMsg').textContent===OFFMSG)aMsg('')}catch(e){}});
 function closeAuth(){$('auth').classList.add('hide');document.activeElement&&document.activeElement.blur&&document.activeElement.blur()}
+const OFFMSG='You are offline. Please connect to the internet and log in once, so your progress is saved to your account.';
+function authBlock(){if(typeof FIREBASE_CONFIG==='undefined'||!FIREBASE_CONFIG)return '';if(!navigator.onLine)return OFFMSG;if(!FB)return 'Connecting to the server... please try again in a moment.';return ''}
 async function aSubmit(){
+  {const bl=authBlock();if(bl){aMsg(bl);return aShake()}}
   const n=$('fName').value.trim(),m=$('fMail').value.trim().toLowerCase(),p=$('fPass').value;
   if(AUTH.mode==='up'&&n.length<2)return aMsg('Please enter your name.'),aShake();
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))return aMsg('Please enter a valid email.'),aShake();
@@ -1659,9 +1673,11 @@ function authInit(){
   $('auth').addEventListener('keyup',e=>e.stopPropagation());
   $('who').onclick=()=>{if(confirm('Log out '+AUTH.user.name+'?')){BE.out();setUser(null);sfx('click')}};
   setInterval(drawWho,250);drawWho();
-  if(FIREBASE_CONFIG){const src=['app','auth','firestore','analytics'].map(n=>'https://www.gstatic.com/firebasejs/10.12.2/firebase-'+n+'-compat.js');let i=0;
-    const nx=()=>{if(i>=src.length){FB=firebase;FB.initializeApp(FIREBASE_CONFIG);try{DB=FB.firestore()}catch(e){}try{FB.analytics()}catch(e){}FB.auth().onAuthStateChanged(u=>{if(u){setUser({name:u.displayName||u.email.split('@')[0],email:u.email});cloudLogin()}else if(LS.g('gw_user'))setUser(null)});return}
-      const e=document.createElement('script');e.src=src[i++];e.onload=nx;document.head.appendChild(e)};nx()}
+  if(FIREBASE_CONFIG){const mods=['app','auth','firestore','analytics'];let i=0;
+    const load=(u,ok,bad)=>{const e=document.createElement('script');e.src=u;e.onload=ok;e.onerror=()=>{e.remove();bad()};document.head.appendChild(e)};
+    const nx=()=>{if(i>=mods.length){FB=firebase;FB.initializeApp(FIREBASE_CONFIG);try{DB=FB.firestore();DB.enablePersistence({synchronizeTabs:false}).catch(()=>{})}catch(e){}try{FB.analytics()}catch(e){}FB.auth().onAuthStateChanged(u=>{if(u){setUser({name:u.displayName||u.email.split('@')[0],email:u.email});cloudLogin()}else if(LS.g('gw_user'))setUser(null)});return}
+      const nm=mods[i],opt=nm==='analytics',next=()=>{i++;nx()};
+      load('fb/firebase-'+nm+'-compat.js',next,()=>load('https://www.gstatic.com/firebasejs/10.12.2/firebase-'+nm+'-compat.js',next,()=>{if(opt)next()}))};nx()}
 }
 // ----- audio engine (all synthesised, no files) -----
 const AU={ctx:null,on:true,cur:null,name:null};
