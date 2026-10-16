@@ -73,8 +73,8 @@ body.lowfx *{text-shadow:none!important}
 body.lowfx .mas img,body.lowfx .tile.lockd svg{filter:none!important}
 #gfx{position:absolute;left:2.2em;bottom:2em;z-index:6;font:600 1.3em Fredoka,sans-serif;color:#fff;padding:.35em .9em .4em;border-radius:2em;border:.07em solid #ffffff55;background:#0b2a1fb0;cursor:pointer}
 /* ---- boot / studio splash ---- */
-#boot{position:fixed;inset:0;z-index:90;background:#000;display:none;color:#fff;font-family:Fredoka,"Trebuchet MS",sans-serif;overflow:hidden;transition:opacity .9s}
-#boot.on{display:block}#boot.out{opacity:0;pointer-events:none}
+#boot{position:fixed;inset:0;z-index:90;background:#000;display:block;color:#fff;font-family:Fredoka,"Trebuchet MS",sans-serif;overflow:hidden;transition:opacity .9s}
+#boot.on{display:block}#boot.out{opacity:0;pointer-events:none}#boot.done{display:none}
 .bs{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .9s;text-align:center;padding:0 6vw;box-sizing:border-box}
 .bs.show{opacity:1}
 #b1 .bglow{position:absolute;left:50%;top:50%;width:90vmin;height:50vmin;transform:translate(-50%,-50%) scale(.3);background:radial-gradient(ellipse,#ffd98a40,#ffd98a00 68%);opacity:0;transition:transform 3s ease-out,opacity 2s}
@@ -983,10 +983,10 @@ function update(){
       else{e.x+=e.d*2.7*DF[LV];e.hy=Math.sin(Math.min(1,e.ft/34)*Math.PI)*46;if(e.ft>=34){e.hop=0;e.ft=0;e.hy=0;if(e.x<e.a||e.x>e.b){e.d*=-1;e.x=Math.max(e.a,Math.min(e.b,e.x))}}}
     }else{e.x+=e.d*1.9*DF[LV];if(e.x<e.a||e.x>e.b)e.d*=-1}
     const w=e.k==='beetle'?80:56,h=e.k==='beetle'?50:62,ey=e.y-(e.hy||0);
-    for(const n of nuts){if(n.l>0&&Math.abs(n.x-e.x)<w/2+9&&n.y>ey-h-9&&n.y<ey+9){n.l=0;e.alive=false;e.dead=22;sfx('stomp');burst(e.x,ey-h/2,'#fff3cf',16,4);burst(e.x,ey-h/2,'#b9772e',8,3);break}}
+    for(const n of nuts){if(n.l>0&&Math.abs(n.x-e.x)<w/2+9&&n.y>ey-h-9&&n.y<ey+9){n.l=0;e.alive=false;e.dead=22;sfx('squash');burst(e.x,ey-h/2,'#fff3cf',16,4);burst(e.x,ey-h/2,'#b9772e',8,3);break}}
     if(!e.alive)continue;
     if(p.x+p.w>e.x-w/2&&p.x<e.x+w/2&&p.y+p.h>ey-h&&p.y<ey){
-      if(HERO>=1&&p.sl>0){e.alive=false;e.dead=22;sfx('stomp');burst(e.x,ey-h/2,'#fff3cf',16,4);burst(e.x,ey-h/2,'#b9772e',8,3)}
+      if(HERO>=1&&p.sl>0){e.alive=false;e.dead=22;sfx('squash');burst(e.x,ey-h/2,'#fff3cf',16,4);burst(e.x,ey-h/2,'#b9772e',8,3)}
       else if(p.vy>1&&p.y+p.h<ey-h*.4){e.alive=false;e.dead=22;p.vy=-12;sfx('stomp');burst(e.x,ey-h/2,'#fff3cf',16,4)}
       else hurt(p.x+20<e.x?-1:1);
     }
@@ -1008,7 +1008,7 @@ function setB(s){boss.st=s;boss.t=0}
 function takeNut(){if(ammo>0){ammo--;return true}if(bossNuts>0){bossNuts--;return true}return false}
 function dropSupply(n){for(let i=0;i<n;i++)sup.push({x:6850+AO+((i+Math.random()*.8)/n)*800,y:-110-i*34,vy:0,l:1000,r:0})}
 function hitBoss(n){const b=boss;
-  if(['crouch','idle','slamrec','hurt'].includes(b.st)){b.hp=Math.max(0,b.hp-BHIT[LV]);b.flash=24;sfx('stomp');burst(n.x,n.y,'#ffd23f',14,4);burst(n.x,n.y,'#fff3cf',8,3);shake=Math.max(shake,8);
+  if(['crouch','idle','slamrec','hurt'].includes(b.st)){b.hp=Math.max(0,b.hp-BHIT[LV]);b.flash=24;sfx('bonk');burst(n.x,n.y,'#ffd23f',14,4);burst(n.x,n.y,'#fff3cf',8,3);shake=Math.max(shake,8);
     if(b.hp<=0){setB('defeated');waves=[];sup=[];shake=40;b.done=1;sfx('charged');msg={s:LV===1?'Jump over him and enter the tunnel!':BN[LV]+' defeated!',l:260}}}
   else{burst(n.x,n.y,'#fff3cf',8,3);sfx('nope');if(!b.tip2){b.tip2=1;msg={s:'Nuts bounce off him in the air! Hit him after he lands!',l:160}}}}
 function bossUpdate(){
@@ -1219,7 +1219,7 @@ function bootSfx(kind){const C=AU.ctx;if(!C||C.state!=='running'||!AU.on)return;
     pn(783.99,t0+.55,1.6,.12);pn(1174.7,t0+.7,1.8,.1);pn(1567.98,t0+.85,2,.08)}
   else if(kind==='out'){pn(1046.5,t0,1.2,.07);pn(1318.5,t0+.08,1.4,.06)}}
 let bootDone=false,bootT=[];
-function bootEnd(){if(bootDone)return;bootDone=true;bootT.forEach(clearTimeout);const b=$('boot');b.classList.add('out');setTimeout(()=>{b.classList.remove('on')},1000)}
+function bootEnd(){if(bootDone)return;bootDone=true;bootT.forEach(clearTimeout);const b=$('boot');b.classList.add('out');setTimeout(()=>{b.classList.remove('on');b.classList.add('done')},1000)}
 function bootRun(){const b1=$('b1'),b2=$('b2'),at=(ms,f)=>bootT.push(setTimeout(f,ms));
   bootSfx('logo');at(60,()=>b1.classList.add('show'));
   at(4800,()=>b1.classList.remove('show'));
@@ -1304,7 +1304,7 @@ function showLevels(){if(state!=='select')return;sfx('click');state='levels';fix
 function startRun(){if(state!=='levels')return;if(!window.NOINTRO){if(SELLV===1&&!INTRO_SEEN){startIntro('oak');return}if(SELLV===11&&!INTROC_SEEN){startIntro('coco');return}if(SELLV===21&&!INTROP_SEEN){startIntro('bao');return}}sfx('click');RUNCOL=emptyCol();RUNPOT={};LV=SELLV;reset();state='play';{const left=flies.filter(f=>!f.got).length;if(left<flies.length)msg={s:left+' coins left to find here',l:170}}}
 function toTitle(){state='title';tr.on=false;RUNCOL=emptyCol();RUNPOT={}}
 function bankLevel(how){wallet+=score;try{localStorage.setItem('gw_coins',wallet)}catch(e){}bankRun();cloudSave(how,score)}
-function endRun(s){if(state!=='play')return;state=s;if(s==='win'){if(LV<=10){MAXLV=Math.min(10,Math.max(MAXLV,LV+1));LS.s('gw_maxlv',MAXLV)}else if(LV>20){MAXP=Math.min(30,Math.max(MAXP,LV+1));LS.s('gw_maxp',MAXP)}else{MAXC=Math.min(20,Math.max(MAXC,LV+1));LS.s('gw_maxc',MAXC)}bankLevel('win');if(LV===4){startCut();return}if(LV===24&&!LS.g('gw_bmid')){startIntro('bmid');return}if(LV===30&&!LS.g('gw_bend')){startIntro('bend');return}if(LV===14&&!LS.g('gw_cmid')){startIntro('cmid');return}if(LV===20&&!LS.g('gw_cend')){startIntro('cend');return}if(LV===10&&finPot){finPot=false;startIntro('fin');return}}else{if(!(s==='over'&&boss.on)){RUNCOL=emptyCol();RUNPOT={}}cloudSave(s,0)}}
+function endRun(s){if(state!=='play')return;state=s;sfx(s==='win'?'yay':s==='over'?'sad':'');if(s==='win'){if(LV<=10){MAXLV=Math.min(10,Math.max(MAXLV,LV+1));LS.s('gw_maxlv',MAXLV)}else if(LV>20){MAXP=Math.min(30,Math.max(MAXP,LV+1));LS.s('gw_maxp',MAXP)}else{MAXC=Math.min(20,Math.max(MAXC,LV+1));LS.s('gw_maxc',MAXC)}bankLevel('win');if(LV===4){startCut();return}if(LV===24&&!LS.g('gw_bmid')){startIntro('bmid');return}if(LV===30&&!LS.g('gw_bend')){startIntro('bend');return}if(LV===14&&!LS.g('gw_cmid')){startIntro('cmid');return}if(LV===20&&!LS.g('gw_cend')){startIntro('cend');return}if(LV===10&&finPot){finPot=false;startIntro('fin');return}}else{if(!(s==='over'&&boss.on)){RUNCOL=emptyCol();RUNPOT={}}cloudSave(s,0)}}
 const LOCK='<svg viewBox="0 0 64 64"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#dfe6ee" stroke-width="6" stroke-linecap="round"/><rect x="12" y="28" width="40" height="28" rx="8" fill="#e9b949" stroke="#7a4a0a" stroke-width="3"/><circle cx="32" cy="41" r="4" fill="#7a4a0a"/></svg>';
 const HNM=['Oakie','Coco','Bao'];
 const HEROES=[{n:HERO_NAME,role:'The Brave Acorn',st:[['Speed',.62],['Jump',.8],['Luck',.5]]},{n:'Coco',role:'The Cool Coconut',st:[['Speed',.55],['Jump',.6],['Luck',.85]]},{n:'Bao',role:'The Chubby Panda',st:[['Speed',.5],['Jump',.7],['Luck',.75]]}].concat(Array(12).fill(0));
@@ -1630,11 +1630,11 @@ const BE={
   async signup(n,m,p){if(FB){const c=await FB.auth().createUserWithEmailAndPassword(m,p);await c.user.updateProfile({displayName:n});return{name:n,email:m}}
     const a=accs();if(a[m])throw{code:'auth/email-already-in-use'};a[m]={name:n,h:await hashPw(p)};LS.s('gw_acc',JSON.stringify(a));return{name:n,email:m}},
   async signin(m,p){if(FB){const c=await FB.auth().signInWithEmailAndPassword(m,p);return{name:c.user.displayName||m.split('@')[0],email:m}}
-    const a=accs()[m];if(!a||a.h!==await hashPw(p))throw{code:'auth/invalid-credential'};return{name:a.name,email:m}},
+    const a=accs()[m];if(!a)throw{code:'auth/user-not-found'};if(a.h!==await hashPw(p))throw{code:'auth/wrong-password'};return{name:a.name,email:m}},
   async reset(m){if(FB){await FB.auth().sendPasswordResetEmail(m);return}throw{code:'local/noreset'}},
   async out(){if(FB)try{await FB.auth().signOut()}catch(e){}}
 };
-const ERR={'auth/email-already-in-use':'That email already has an account. Please sign in.','auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs at least 6 characters.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No internet connection.','local/noreset':'Reset emails need the online setup. Not switched on yet.'};
+const ERR={'auth/email-already-in-use':'That email already has an account. Please sign in.','auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs at least 6 characters.','auth/invalid-credential':'Wrong email or password. New here? Tap Sign up to create your account first.','auth/wrong-password':'Wrong password. Please try again.','auth/user-not-found':'No account found with this email. Please sign up first.','auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No internet connection.','local/noreset':'Reset emails need the online setup. Not switched on yet.'};
 function setUser(u){AUTH.user=u;if(u){LS.s('gw_user',JSON.stringify(u));cloudLogin()}else{LS.d('gw_user');LS.d('gw_coins');LS.d('gw_col');LS.d('gw_pot');LS.d('gw_maxlv');LS.d('gw_inv');LS.d('gw_maxc');LS.d('gw_maxp');LS.d('gw_dirty');LS.d('gw_uid');MAXC=11;MAXP=21;INV=defInv();try{applySkin()}catch(e){}wallet=0;BEST=0;MAXLV=1;COL=emptyCol();POTS=emptyPots();RUNCOL=emptyCol();RUNPOT={};SELLV=1;CSYNC=null}drawWho()}
 function drawWho(){const w=$('who');if(!w)return;const show=AUTH.user&&(state==='title'||state==='select');w.style.display=show?'block':'none';if(show)w.innerHTML='&#128100; '+AUTH.user.name.replace(/[<>&]/g,'')+'<small>logged in</small>'}
 function aMsg(t,ok){const m=$('aMsg');m.textContent=t||'';m.className=ok?'ok':''}
@@ -1645,7 +1645,7 @@ function aMode(m){AUTH.mode=m;const up=m==='up',rs=m==='reset';
   $('fPass').autocomplete=up?'new-password':'current-password';
   $('aGo').textContent=up?'Create account':rs?'Send reset link':'Sign in';
   $('aForgot').textContent=rs?'Back to sign in':'Forgot password?';$('aForgot').style.display=up?'none':'';
-  $('tIn').innerHTML=LS.g('gw_has')==='1'?'Sign in':'&#128274; Sign in';$('tIn').classList.toggle('lk',LS.g('gw_has')!=='1');aMsg('')}
+  $('tIn').innerHTML='Sign in';$('tIn').classList.remove('lk');aMsg('')}
 function openAuth(){if(!AUTH.next)AUTH.next=null;aMode(LS.g('gw_has')==='1'?'in':'up');$('auth').classList.remove('hide');{const bl=authBlock();if(bl)aMsg(bl)}}
 addEventListener('online',()=>{try{if(!$('auth').classList.contains('hide')&&$('aMsg').textContent===OFFMSG)aMsg('')}catch(e){}});
 function closeAuth(){$('auth').classList.add('hide');document.activeElement&&document.activeElement.blur&&document.activeElement.blur()}
@@ -1666,7 +1666,7 @@ async function aSubmit(){
 function authInit(){
   try{const u=JSON.parse(LS.g('gw_user')||'null');if(u)AUTH.user=u}catch(e){}
   $('tUp').onclick=()=>{aMode('up');sfx('click')};
-  $('tIn').onclick=()=>{if(LS.g('gw_has')!=='1'){aMsg('Sign in unlocks after you create your account.');aShake();return}aMode('in');sfx('click')};
+  $('tIn').onclick=()=>{aMode('in');sfx('click')};
   $('aGo').onclick=aSubmit;$('aBack').onclick=()=>{AUTH.next=null;closeAuth();sfx('click')};
   $('aForgot').onclick=()=>{aMode(AUTH.mode==='reset'?'in':'reset');sfx('click')};
   $('auth').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();aSubmit()}});
@@ -1705,20 +1705,41 @@ function twang(t0,d){const C=AU.ctx,o=C.createOscillator(),gn=C.createGain(),lf=
   o.type='triangle';o.frequency.setValueAtTime(900,t0);o.frequency.exponentialRampToValueAtTime(240,t0+.2);
   lf.frequency.value=34;lg.gain.setValueAtTime(110,t0);lg.gain.exponentialRampToValueAtTime(1,t0+.2);lf.connect(lg);lg.connect(o.frequency);
   gn.gain.setValueAtTime(.26,t0);gn.gain.exponentialRampToValueAtTime(.001,t0+.22);o.connect(gn);gn.connect(d);[o,lf].forEach(x=>{x.start(t0);x.stop(t0+.27)})}
+const VOWF={a:[800,1250,2800],o:[500,900,2700],u:[330,800,2500],i:[300,2300,3100],e:[560,1800,2600],ae:[720,1700,2500]};
+function vpk(){return HERO===1?1.2:HERO===2?.8:1}
+function vox(t0,o){const C=AU.ctx,d=o.d,dest=AU.sfxBus,sc=vpk()*(1+(Math.random()-.5)*.08),vol=o.vol||.5;
+  const os=C.createOscillator();os.type='sawtooth';
+  o.f.forEach(([t,h],i)=>{const fr=h*sc;if(i===0)os.frequency.setValueAtTime(fr,t0+t*d);else os.frequency.linearRampToValueAtTime(fr,t0+t*d)});
+  const lf=C.createOscillator(),lg=C.createGain();lf.frequency.value=o.vr||6.5;lg.gain.value=o.f[0][1]*sc*(o.vib===undefined?.02:o.vib);lf.connect(lg);lg.connect(os.frequency);
+  const gn=C.createGain();gn.gain.setValueAtTime(0,t0);gn.gain.linearRampToValueAtTime(vol,t0+.025);gn.gain.setValueAtTime(vol,t0+Math.max(.026,d-.07));gn.gain.linearRampToValueAtTime(0,t0+d);
+  [0,1,2].forEach(k=>{const bp=C.createBiquadFilter();bp.type='bandpass';bp.Q.value=k?9:6;
+    o.v.forEach(([t,w],i)=>{const fr=VOWF[w][k]*(1+(sc-1)*.35);if(i===0)bp.frequency.setValueAtTime(fr,t0+t*d);else bp.frequency.linearRampToValueAtTime(fr,t0+t*d)});
+    const fg=C.createGain();fg.gain.value=[2.2,1.5,.8][k];os.connect(bp);bp.connect(fg);fg.connect(gn)});
+  gn.connect(dest);[os,lf].forEach(x=>{x.start(t0);x.stop(t0+d+.05)});if(!o.nb)noiseHit(t0,.05,.05,dest,'bandpass',2800)}
+function whistle(t0,f0,f1,d,v){const C=AU.ctx,o=C.createOscillator(),lf=C.createOscillator(),lg=C.createGain(),gn=C.createGain();o.type='sine';o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f1,t0+d*.9);
+  lf.frequency.value=7;lg.gain.value=f0*.018;lf.connect(lg);lg.connect(o.frequency);gn.gain.setValueAtTime(0,t0);gn.gain.linearRampToValueAtTime(v,t0+.02);gn.gain.setValueAtTime(v,t0+d-.06);gn.gain.linearRampToValueAtTime(0,t0+d);
+  o.connect(gn);gn.connect(AU.sfxBus);[o,lf].forEach(x=>{x.start(t0);x.stop(t0+d+.05)})}
+function pluck(f,t0,v,len){const C=AU.ctx,d=AU.sfxBus,L=len||.35;[[1,1],[3,.28],[4.2,.1]].forEach(([m,a])=>{const o=C.createOscillator(),g=C.createGain();o.type='sine';o.frequency.value=f*m;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v*a*1.8,t0+.004);g.gain.exponentialRampToValueAtTime(.001,t0+L/m**.5);o.connect(g);g.connect(d);o.start(t0);o.stop(t0+L+.05)})}
+function squeak(t0,v){const C=AU.ctx,o=C.createOscillator(),lf=C.createOscillator(),lg=C.createGain(),g=C.createGain();o.type='sine';o.frequency.setValueAtTime(1300,t0);o.frequency.exponentialRampToValueAtTime(2700,t0+.06);o.frequency.exponentialRampToValueAtTime(900,t0+.16);
+  lf.frequency.value=38;lg.gain.value=70;lf.connect(lg);lg.connect(o.frequency);g.gain.setValueAtTime(v,t0);g.gain.exponentialRampToValueAtTime(.001,t0+.17);o.connect(g);g.connect(AU.sfxBus);[o,lf].forEach(x=>{x.start(t0);x.stop(t0+.2)})}
 function sfx(n){const C=AU.ctx;if(!C||!AU.on||C.state!=='running')return;const t0=C.currentTime,d=AU.sfxBus;
-  if(n==='jump')boing(t0,d,300,640,.24,.32)
-  else if(n==='coin'){tone(988,t0,.08,'square',.09,d);tone(1319,t0+.07,.16,'square',.09,d)}
-  else if(n==='stomp'){tone(220,t0,.14,'triangle',.3,d,{to:90});noiseHit(t0,.1,.2,d,'lowpass',1200)}
-  else if(n==='hurt'){tone(340,t0,.3,'triangle',.24,d,{to:110});tone(300,t0,.26,'sine',.14,d,{to:90})}
-  else if(n==='boing')tone(200,t0,.3,'sine',.3,d,{to:640});
-  else if(n==='heart')[523,659,784,1047].forEach((f,i)=>tone(f,t0+i*.07,.14,'triangle',.18,d));
-  else if(n==='flap'){boing(t0,d,480,1000,.2,.28);tone(1568,t0+.13,.1,'sine',.06,d)}
-  else if(n==='throw'){twang(t0,d);tone(760,t0+.05,.1,'sine',.34,d,{to:190,a:.002,r:.05});tone(1500,t0+.05,.05,'triangle',.1,d,{to:600,a:.001,r:.03});noiseHit(t0+.05,.06,.1,d,'bandpass',1800)}
-  else if(n==='charged')[659,880,1175,1568,2093].forEach((f,i)=>tone(f,t0+i*.06,.2,'triangle',.16,d));
-  else if(n==='slide'){noiseHit(t0,.3,.12,d,'bandpass',1400);tone(620,t0,.26,'sine',.08,d,{to:240})}
-  else if(n==='thunder'){noiseHit(t0,1.2,.5,d,'lowpass',420);tone(70,t0,1,'sine',.5,d,{to:30})}
-  else if(n==='click')tone(660,t0,.07,'square',.09,d);
-  else if(n==='nope')tone(200,t0,.18,'square',.08,d,{to:120})}
+  if(n==='jump'){vox(t0,{f:[[0,360],[.5,640],[1,560]],v:[[0,'u'],[.45,'a'],[1,'o']],d:.2,vol:.45});boing(t0,d,300,650,.24,.12)}
+  else if(n==='flap'){vox(t0,{f:[[0,520],[1,1100]],v:[[0,'i'],[1,'e']],d:.32,vol:.4,vib:.035});pluck(1568,t0+.12,.08,.25);pluck(2093,t0+.2,.06,.25)}
+  else if(n==='throw'){vox(t0,{f:[[0,720],[1,430]],v:[[0,'a'],[1,'o']],d:.14,vol:.42,nb:1});noiseHit(t0,.14,.2,d,'bandpass',2200);whistle(t0+.03,1900,700,.12,.07)}
+  else if(n==='slide'){whistle(t0,1500,360,.5,.2);noiseHit(t0,.4,.1,d,'bandpass',1300);vox(t0+.02,{f:[[0,900],[1,420]],v:[[0,'i'],[.6,'e'],[1,'o']],d:.42,vol:.18,vib:.04})}
+  else if(n==='squash'){squeak(t0,.22);noiseHit(t0+.03,.07,.22,d,'lowpass',1000);tone(520,t0+.03,.07,'sine',.28,d,{to:120});pluck(1319,t0+.1,.06,.2)}
+  else if(n==='bonk'){tone(340,t0,.16,'sine',.45,d,{to:95});noiseHit(t0,.05,.3,d,'bandpass',1600);vox(t0+.05,{f:[[0,330],[1,210]],v:[[0,'o'],[1,'u']],d:.22,vol:.35});pluck(2093,t0+.12,.07,.3);pluck(2637,t0+.2,.06,.3)}
+  else if(n==='stomp'){tone(150,t0,.2,'triangle',.4,d,{to:55});noiseHit(t0,.14,.28,d,'lowpass',900);tone(420,t0,.08,'sine',.2,d,{to:140})}
+  else if(n==='hurt'){vox(t0,{f:[[0,640],[.4,850],[.55,720],[1,300]],v:[[0,'a'],[.4,'ae'],[.7,'o'],[1,'u']],d:.6,vol:.5,vib:.03})}
+  else if(n==='coin'){pluck(1319,t0,.2,.3);pluck(1976,t0+.07,.2,.4)}
+  else if(n==='boing'){boing(t0,d,220,700,.5,.34);pluck(1047,t0+.02,.07,.25)}
+  else if(n==='heart'){[523,659,784,1047,1319].forEach((f,i)=>pluck(f,t0+i*.06,.17,.35))}
+  else if(n==='charged'){[659,880,1175,1568,2093].forEach((f,i)=>pluck(f,t0+i*.055,.14,.3));vox(t0+.12,{f:[[0,430],[1,720]],v:[[0,'u'],[1,'o']],d:.17,vol:.4});vox(t0+.32,{f:[[0,820],[1,660]],v:[[0,'o'],[1,'o']],d:.32,vol:.42,vib:.04})}
+  else if(n==='yay'){[523,659,784,1047,1319,1568].forEach((f,i)=>pluck(f,t0+i*.07,.15,.4));vox(t0+.1,{f:[[0,500],[1,950]],v:[[0,'i'],[1,'e']],d:.3,vol:.42,vib:.03});vox(t0+.42,{f:[[0,980],[.5,880],[1,720]],v:[[0,'a'],[1,'a']],d:.55,vol:.45,vib:.05,vr:7})}
+  else if(n==='sad'){[[250,.28],[235,.28],[220,.28],[185,.8]].reduce((a,[f,l],i)=>{vox(a,{f:[[0,f],[1,i===3?f*.88:f]],v:[[0,'u'],[.5,'a'],[1,'u']],d:l,vol:.5,vib:i===3?.045:.012,vr:i===3?6:5,nb:1});return a+l+.03},t0)}
+  else if(n==='nope'){vox(t0,{f:[[0,520],[1,470]],v:[[0,'a'],[1,'o']],d:.13,vol:.4});vox(t0+.17,{f:[[0,400],[1,320]],v:[[0,'o'],[1,'u']],d:.22,vol:.4})}
+  else if(n==='click'){tone(900,t0,.05,'sine',.35,d,{to:560});noiseHit(t0,.02,.08,d,'bandpass',3000)}
+  else if(n==='thunder'){noiseHit(t0,1.2,.5,d,'lowpass',420);tone(70,t0,1,'sine',.5,d,{to:30})}}
 const MEL=("E5 . G5 . E5 G5 C6 . B5 . G5 . D5 G5 B5 . A5 . E5 . C5 E5 A5 . G5 . F5 . A5 . C6 . E5 G5 C6 . B5 C6 D6 . D6 . B5 . G5 B5 D6 . C6 B5 A5 . C6 . E6 . D6 . C6 . A5 . F5 .").split(' ');
 const MELN=(()=>{const out=Array(64).fill(null);let last=-1;MEL.forEach((x,i)=>{if(x==='.'){if(last>=0)out[last].l++}else{out[i]={m:nm(x),l:1};last=i}});return out})();
 function menuTrack(cur,C){const SP=60/128/2,tg=cur.tg,CH=[[60,64,67],[59,62,67],[60,64,69],[60,65,69]],BS=[48,43,45,41];let n=0,nt=C.currentTime+.1;
